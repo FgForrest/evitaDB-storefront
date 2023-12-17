@@ -2,8 +2,11 @@
   <div>
     <NavContainer :categoryId="categoryId" />
     <div>
-      <!-- Not working Primevue feature bug fix
-      <DataView :value="data.listProduct" :layout="layout">
+      <DataView
+        :value="data.listProduct"
+        :layout="layout"
+        :data-key="'primaryKey'"
+      >
         <template #header>
           <div class="flex justify-content-end">
             <DataViewLayoutOptions v-model="layout" />
@@ -23,8 +26,8 @@
               >
                 <img
                   class="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round"
-                  src="https://primefaces.org/cdn/primevue/images/product/game-controller.jpg"
-                  :alt="item.name"
+                  src="~/assets/no-image.svg"
+                  :alt="item.attributes.name"
                 />
                 <div
                   class="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4"
@@ -33,33 +36,26 @@
                     class="flex flex-column align-items-center sm:align-items-start gap-3"
                   >
                     <div class="text-2xl font-bold text-900">
-                      {{ item.name }}
+                      {{ item.attributes.name }}
                     </div>
-                    <Rating
-                      :modelValue="item.rating"
-                      readonly
-                      :cancel="false"
-                    ></Rating>
                     <div class="flex align-items-center gap-3">
                       <span class="flex align-items-center gap-2">
                         <i class="pi pi-tag"></i>
-                        <span class="font-semibold">{{ item.category }}</span>
+                        <span class="font-semibold">{{
+                          item.attributes.brandCode
+                        }}</span>
                       </span>
-                      <Tag
-                        :value="item.inventoryStatus"
-                      ></Tag>
                     </div>
                   </div>
                   <div
                     class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2"
                   >
                     <span class="text-2xl font-semibold"
-                      >${{ item.price }}</span
+                      >{{ item.priceForSale.priceWithTax }}</span
                     >
                     <Button
                       icon="pi pi-shopping-cart"
                       rounded
-                      :disabled="item.inventoryStatus === 'OUTOFSTOCK'"
                     ></Button>
                   </div>
                 </div>
@@ -83,46 +79,39 @@
                 >
                   <div class="flex align-items-center gap-2">
                     <i class="pi pi-tag"></i>
-                    <span class="font-semibold">{{ item.category }}</span>
+                    <span class="font-semibold">{{
+                      item.attributes.brandCode
+                    }}</span>
                   </div>
-                  <Tag
-                    :value="item.inventoryStatus"
-                  ></Tag>
                 </div>
                 <div class="flex flex-column align-items-center gap-3 py-5">
                   <img
                     class="w-9 shadow-2 border-round"
-                    src="https://primefaces.org/cdn/primevue/images/product/game-controller.jpg"
-                    :alt="item.name"
+                    src="~/assets/no-image.svg"
+                    :alt="item.attributes.name"
                   />
-                  <div class="text-2xl font-bold">{{ item.name }}</div>
-                  <Rating
-                    :modelValue="item.rating"
-                    readonly
-                    :cancel="false"
-                  ></Rating>
+                  <div class="text-2xl font-bold">
+                    {{ item.attributes.name }}
+                  </div>
                 </div>
                 <div class="flex align-items-center justify-content-between">
-                  <span class="text-2xl font-semibold">${{ item.price }}</span>
-                  <Button
-                    icon="pi pi-shopping-cart"
-                    rounded
-                    :disabled="item.inventoryStatus === 'OUTOFSTOCK'"
-                  ></Button>
+                  <span class="text-2xl font-semibold"
+                    >{{ item.priceForSale.priceWithTax }} EUR</span
+                  >
+                  <Button icon="pi pi-shopping-cart" rounded></Button>
                 </div>
               </div>
             </div>
           </div>
         </template>
       </DataView>
-      -->
     </div>
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 const route = useRoute();
-const layout = ref("grid");
+const layout = ref<any>("grid");
 
 const categoryId = route.params.id;
 
@@ -133,17 +122,57 @@ const query = gql`
         hierarchyCategoriesWithinRoot: {
           having: { entityPrimaryKeyInSet: ${categoryId} }
         }
-        entityLocaleEquals: en
+        entityLocaleEquals: en,
+        priceInPriceLists: [
+        "basic"
+      ],
+        priceInCurrency: EUR
       }
     ) {
+      primaryKey
       attributes {
         name
+        brandCode
       }
+      categories {
+        referencedEntity {
+          attributes {
+            name
+          }
+        }
+      },
+      priceForSale {
+          priceWithoutTax
+          priceWithTax
+          taxRate
+        }
     }
   }
 `;
 
-const { data } = await useAsyncQuery(query);
+type ListProduct = {
+  listProduct: {
+    primaryKey: number;
+    attributes: {
+      name: string;
+      brandCode: string;
+    };
+    categories: {
+      referencedEntity: {
+        attributes: {
+          name: string;
+        };
+      };
+    }[];
+    priceForSale: {
+      priceWithoutTax: number;
+      priceWithTax: number;
+      taxRate: number;
+    };
+  }[];
+};
+
+const { data } = await useAsyncQuery<ListProduct>(query);
 </script>
 
 <style scoped></style>

@@ -9,7 +9,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 const { categoryId } = defineProps(["categoryId"]);
 const query = gql`
   query {
@@ -28,7 +28,16 @@ const query = gql`
   }
 `;
 
-const { data } = await useAsyncQuery(query);
+type ListCategory = { 
+  listCategory:{
+    primaryKey: number,
+    attributes: {
+      name: string
+    }
+  }[]
+}
+
+const { data } = await useAsyncQuery<ListCategory>(query, categoryId);
 </script>
 
 <style scoped>

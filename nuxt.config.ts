@@ -2,16 +2,15 @@
 import { resolve } from "path";
 export default defineNuxtConfig({
   primevue: {
+    usePrimeVue: true,
     options: {
       ripple: true,
-    },
-    components: {
-      include: "*",
     },
   },
   css: [
     "primevue/resources/themes/lara-light-teal/theme.css",
     "primeicons/primeicons.css",
+    "primeflex/primeflex.css"
   ],
   devtools: { enabled: true },
   modules: ["@nuxtjs/apollo", "nuxt-primevue"],
