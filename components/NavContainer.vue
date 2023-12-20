@@ -1,10 +1,11 @@
 <template>
   <div class="links">
     <NavCard
-      v-for="(item, index) in data.listCategory"
+      v-for="(item, index) in data.listCategory.filter(x => x.parentPrimaryKey !== null)"
       :key="'card' + index"
       :name="item.attributes.name"
       :primaryKey="item.primaryKey"
+      class="card"
     />
   </div>
 </template>
@@ -31,6 +32,7 @@ const query = gql`
 type ListCategory = { 
   listCategory:{
     primaryKey: number,
+    parentPrimaryKey: number,
     attributes: {
       name: string
     }
@@ -43,7 +45,9 @@ const { data } = await useAsyncQuery<ListCategory>(query, categoryId);
 <style scoped>
 .links {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-flow: wrap;
+}
+.card {
+  margin: 10px;
 }
 </style>

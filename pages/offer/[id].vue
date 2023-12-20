@@ -3,7 +3,7 @@
     <NavContainer :categoryId="categoryId" />
     <div>
       <DataView
-        :value="data.listProduct"
+        :value="data.queryProduct.recordPage.data"
         :layout="layout"
         :data-key="'primaryKey'"
       >
@@ -50,13 +50,10 @@
                   <div
                     class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2"
                   >
-                    <span class="text-2xl font-semibold"
-                      >{{ item.priceForSale.priceWithTax }}</span
-                    >
-                    <Button
-                      icon="pi pi-shopping-cart"
-                      rounded
-                    ></Button>
+                    <span class="text-2xl font-semibold">{{
+                      item.priceForSale.priceWithTax
+                    }}</span>
+                    <Button icon="pi pi-shopping-cart" rounded></Button>
                   </div>
                 </div>
               </div>
@@ -105,6 +102,7 @@
           </div>
         </template>
       </DataView>
+      <PageCounter :categoryId="categoryId" @change-page="changePage" />
     </div>
   </div>
 </template>
@@ -115,64 +113,73 @@ const layout = ref<any>("grid");
 
 const categoryId = route.params.id;
 
-const query = gql`
-  query {
-    listProduct(
+const queryPage = gql`
+  query getProducts  {
+    queryProduct(
       filterBy: {
-        hierarchyCategoriesWithinRoot: {
-          having: { entityPrimaryKeyInSet: ${categoryId} }
+        hierarchyCategoriesWithin: {
+          ofParent: { entityPrimaryKeyInSet: ${categoryId} }
         }
-        entityLocaleEquals: en,
-        priceInPriceLists: [
-        "basic"
-      ],
+        entityLocaleEquals: en
+        priceInPriceLists: ["basic"]
         priceInCurrency: EUR
       }
     ) {
-      primaryKey
-      attributes {
-        name
-        brandCode
-      }
-      categories {
-        referencedEntity {
+      recordPage(number: 1, size: 50) {
+        data {
+          primaryKey
           attributes {
             name
+            brandCode
+          }
+          categories {
+            referencedEntity {
+              attributes {
+                name
+              }
+            }
+          }
+          priceForSale {
+            priceWithoutTax
+            priceWithTax
+            taxRate
           }
         }
-      },
-      priceForSale {
-          priceWithoutTax
-          priceWithTax
-          taxRate
-        }
+        totalRecordCount
+      }
     }
   }
 `;
 
 type ListProduct = {
-  listProduct: {
-    primaryKey: number;
-    attributes: {
-      name: string;
-      brandCode: string;
-    };
-    categories: {
-      referencedEntity: {
+  queryProduct: {
+    recordPage: {
+      data: {
+        primaryKey: number;
         attributes: {
           name: string;
+          brandCode: string;
         };
-      };
-    }[];
-    priceForSale: {
-      priceWithoutTax: number;
-      priceWithTax: number;
-      taxRate: number;
+        categories: {
+          referencedEntity: {
+            attributes: {
+              name: string;
+            };
+          };
+        }[];
+        priceForSale: {
+          priceWithoutTax: number;
+          priceWithTax: number;
+          taxRate: number;
+        };
+      }[];
     };
-  }[];
+  };
 };
 
-const { data } = await useAsyncQuery<ListProduct>(query);
+const { data } = useAsyncQuery<ListProduct>(queryPage);
+
+async function changePage(page: number) {}
 </script>
 
 <style scoped></style>
