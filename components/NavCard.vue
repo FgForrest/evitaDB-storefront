@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NuxtLink :to="'/offer/'+primaryKey" rel="noopener noreferrer" class="p-button font-bold">{{ name }}</NuxtLink>
+    <NuxtLink :to="'/offer/'+primaryKey+'/1'" rel="noopener noreferrer" class="p-button font-bold">{{ name }}</NuxtLink>
   </div>
 </template>
 

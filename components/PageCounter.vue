@@ -10,21 +10,10 @@
     </div>
     <div class="pages">
       <ul class="list">
-        <li
-          v-for="index in data.queryProduct.recordPage.totalRecordCount"
-          :key="index"
-          :class="
-            !(
-              index > page.position - 5 && index < page.position + 5
-            )
-              ? 'hidden'
-              : 'center'
-          "
-          @click="changePage(index)"
-        >
-          <span :class="index === page.position ? 'active' : ''">{{
-            index
-          }}</span>
+        <li v-for="i in getPages()" :key="'page ' + i" class="center">
+          <NuxtLink :to="'/offer/' + categoryId + '/' + i"
+            ><span :class="i === page ? 'active' : ''">{{ i }}</span></NuxtLink
+          >
         </li>
       </ul>
     </div>
@@ -40,69 +29,46 @@
 </template>
 
 <script lang="ts" setup>
-const { categoryId } = defineProps(["categoryId"]);
-const emit = defineEmits(["changePage"]);
-const page = reactive({
-  position: 1,
-});
+const { categoryId, page, lastPageNumber } = defineProps([
+  "categoryId",
+  "page",
+  "lastPageNumber",
+]);
 
-const queryPageCount = gql`
-  query {
-    queryProduct(
-      filterBy: {
-        hierarchyCategoriesWithin: {
-          ofParent: { entityPrimaryKeyInSet: ${categoryId} }
-        }
-      }
-    ) {
-      recordPage {
-        totalRecordCount
-      }
-    }
+const moveNext = async () => {
+  if (lastPageNumber <= page + 1) {
+    await navigateTo("/offer/" + categoryId + "/" + (page + 1));
   }
-`;
-
-type TotalCount = {
-  queryProduct: {
-    recordPage: {
-      totalRecordCount: number;
-    };
-  };
 };
 
-const { data } = await useAsyncQuery<TotalCount>(queryPageCount);
+const moveEnd = async () => {
+  await navigateTo("/offer/" + categoryId + "/" + lastPageNumber);
+};
 
-function changePage(position: number) {
-  page.position = position;
-  emit("changePage", page.position);
-}
+const moveStart = async () => {
+  await navigateTo("/offer/" + categoryId + "/" + 1);
+};
 
-function moveNext() {
-  if (
-    page.position + 1 <=
-    data.value.queryProduct.recordPage.totalRecordCount
-  ) {
-    page.position++;
-    emit("changePage", page.position);
+const movePrevious = async () => {
+  if (page - 1 >= 1) {
+    await navigateTo("/offer/" + categoryId + "/" + (page - 1));
   }
-}
+};
 
-function movePrevious() {
-  if (page.position - 1 >= 1) {
-    page.position--;
-    emit("changePage", page.position);
+const getPages = () => {
+  const pages: number[] = [];
+  let count = 9;
+  for(let i = 1; i < page;i++){
+    pages.push(i);
+    count--;
   }
-}
-
-function moveStart() {
-  page.position = 1;
-  emit("changePage", page.position);
-}
-
-function moveEnd() {
-  page.position = data.value.queryProduct.recordPage.totalRecordCount;
-  emit("changePage", page.position);
-}
+  pages.push(page);
+  
+  for (let i = page+1; i <= (page + count <= lastPageNumber ? page + count : lastPageNumber); i++) {
+    pages.push(i);
+  }
+  return pages;
+};
 </script>
 
 <style scoped>
@@ -115,9 +81,6 @@ function moveEnd() {
 }
 .list li {
   cursor: pointer;
-}
-.hidden {
-  display: none;
 }
 .container {
   width: 100%;
@@ -170,5 +133,9 @@ function moveEnd() {
   margin-left: 60px;
   margin-right: 40px;
   align-self: center;
+}
+a{
+  text-decoration: none;
+  color: black;
 }
 </style>

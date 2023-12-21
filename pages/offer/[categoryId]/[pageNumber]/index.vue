@@ -102,7 +102,11 @@
           </div>
         </template>
       </DataView>
-      <PageCounter :categoryId="categoryId" @change-page="changePage" />
+      <PageCounter
+        :categoryId="parseInt(categoryId)"
+        :page="parseInt(pageNumber)"
+        :last-page-number="data.queryProduct.recordPage.lastPageNumber"
+      />
     </div>
   </div>
 </template>
@@ -111,21 +115,22 @@
 const route = useRoute();
 const layout = ref<any>("grid");
 
-const categoryId = route.params.id;
+const categoryId = route.params.categoryId.toString();
+const pageNumber = route.params.pageNumber.toString();
 
 const queryPage = gql`
-  query getProducts  {
+  query getProducts($categoryId: [Int!], $page: Int!) {
     queryProduct(
       filterBy: {
         hierarchyCategoriesWithin: {
-          ofParent: { entityPrimaryKeyInSet: ${categoryId} }
+          ofParent: { entityPrimaryKeyInSet: $categoryId }
         }
         entityLocaleEquals: en
         priceInPriceLists: ["basic"]
         priceInCurrency: EUR
       }
     ) {
-      recordPage(number: 1, size: 50) {
+      recordPage(number: $page, size: 50) {
         data {
           primaryKey
           attributes {
@@ -145,7 +150,7 @@ const queryPage = gql`
             taxRate
           }
         }
-        totalRecordCount
+        lastPageNumber
       }
     }
   }
@@ -173,13 +178,15 @@ type ListProduct = {
           taxRate: number;
         };
       }[];
+      lastPageNumber: number;
     };
   };
 };
 
-const { data } = useAsyncQuery<ListProduct>(queryPage);
-
-async function changePage(page: number) {}
+const { data } = await useAsyncQuery<ListProduct>(queryPage, {
+  categoryId: parseInt(categoryId),
+  page: parseInt(pageNumber),
+});
 </script>
 
 <style scoped></style>
