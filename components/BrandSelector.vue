@@ -1,7 +1,10 @@
 <template>
   <div>
     <p>Brand</p>
-    <Tree :value="nodes()" selectionMode="checkbox"></Tree>
+    <Tree
+      :value="nodes()"
+      selectionMode="checkbox"
+    ></Tree>
   </div>
 </template>
 
