@@ -29,7 +29,7 @@
                   :class="{ 'border-top-1 surface-border': index !== 0 }"
                 >
                   <NuxtImg
-                    :src="getImage()"
+                    :src="'https://picsum.photos/250/250?random='+index"
                     placeholder
                     class="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round"
                   />
@@ -87,7 +87,7 @@
                   </div>
                   <div class="flex flex-column align-items-center gap-3 py-5">
                     <NuxtImg
-                      :src="getImage()"
+                      :src="'https://picsum.photos/250/250?random='+index"
                       placeholder
                       class="w-9 shadow-2 border-round"
                     />
@@ -117,7 +117,6 @@
 </template>
 
 <script lang="ts" setup>
-import loremPicsum from "lorem-picsum";
 const route = useRoute();
 const layout = ref<any>("grid");
 
@@ -193,13 +192,6 @@ const { data } = await useAsyncQuery<ListProduct>(queryPage, {
   categoryId: parseInt(categoryId),
   page: parseInt(pageNumber),
 });
-
-const getImage = () => {
-  return loremPicsum({
-    width: 250,
-    height: 250,
-  });
-};
 </script>
 
 <style scoped></style>
