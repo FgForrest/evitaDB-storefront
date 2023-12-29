@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { resolve } from "path";
+
 export default defineNuxtConfig({
   primevue: {
     usePrimeVue: true,
@@ -10,10 +11,10 @@ export default defineNuxtConfig({
   css: [
     "primevue/resources/themes/lara-light-teal/theme.css",
     "primeicons/primeicons.css",
-    "primeflex/primeflex.css"
+    "primeflex/primeflex.css",
   ],
   devtools: { enabled: true },
-  modules: ["@nuxtjs/apollo", "nuxt-primevue"],
+  modules: ["@nuxtjs/apollo", "nuxt-primevue", "@nuxt/image"],
   apollo: {
     clients: {
       default: {

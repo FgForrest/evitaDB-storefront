@@ -36,7 +36,7 @@ const { categoryId, page, lastPageNumber } = defineProps([
 ]);
 
 const moveNext = async () => {
-  if (lastPageNumber <= page + 1) {
+  if (page + 1 <= lastPageNumber) {
     await navigateTo("/offer/" + categoryId + "/" + (page + 1));
   }
 };
