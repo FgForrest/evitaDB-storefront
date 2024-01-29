@@ -10,8 +10,8 @@
     </div>
     <div class="pages">
       <ul class="list">
-        <li v-for="i in getPages()" :key="'page ' + i" class="center">
-          <NuxtLink :to="'/offer/' + categoryId + '/' + i"
+        <li v-for="i in getPages()" :key="`page-${i}`" class="center">
+          <NuxtLink :to="`/offer/${categoryId}/${i}`"
             ><span :class="i === page ? 'active' : ''">{{ i }}</span></NuxtLink
           >
         </li>
@@ -29,42 +29,55 @@
 </template>
 
 <script lang="ts" setup>
-const { categoryId, page, lastPageNumber } = defineProps([
-  "categoryId",
-  "page",
-  "lastPageNumber",
-]);
+const { categoryId, page, lastPageNumber } = defineProps({
+  categoryId: {
+    type: Number,
+    required: true,
+  },
+  page: {
+    type: Number,
+    required: true,
+  },
+  lastPageNumber: {
+    type: Number,
+    required: true,
+  },
+});
 
-const moveNext = async () => {
+async function moveNext(): Promise<void> {
   if (page + 1 <= lastPageNumber) {
-    await navigateTo("/offer/" + categoryId + "/" + (page + 1));
+    await navigateTo(`/offer/${categoryId}/${page + 1}`);
   }
-};
+}
 
-const moveEnd = async () => {
-  await navigateTo("/offer/" + categoryId + "/" + lastPageNumber);
-};
+async function moveEnd(): Promise<void> {
+  await navigateTo(`/offer/${categoryId}/${lastPageNumber}`);
+}
 
-const moveStart = async () => {
-  await navigateTo("/offer/" + categoryId + "/" + 1);
-};
+async function moveStart(): Promise<void> {
+  await navigateTo(`/offer/${categoryId}/${1}`);
+}
 
-const movePrevious = async () => {
+async function movePrevious(): Promise<void> {
   if (page - 1 >= 1) {
-    await navigateTo("/offer/" + categoryId + "/" + (page - 1));
+    await navigateTo(`/offer/${categoryId}/${page - 1}`);
   }
-};
+}
 
 const getPages = () => {
   const pages: number[] = [];
   let count = 9;
-  for(let i = 1; i < page;i++){
+  for (let i = 1; i < page; i++) {
     pages.push(i);
     count--;
   }
   pages.push(page);
-  
-  for (let i = page+1; i <= (page + count <= lastPageNumber ? page + count : lastPageNumber); i++) {
+
+  for (
+    let i: number = page + 1;
+    i <= (page + count <= lastPageNumber ? page + count : lastPageNumber);
+    i++
+  ) {
     pages.push(i);
   }
   return pages;
@@ -134,7 +147,7 @@ const getPages = () => {
   margin-right: 40px;
   align-self: center;
 }
-a{
+a {
   text-decoration: none;
   color: black;
 }

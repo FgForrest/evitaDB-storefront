@@ -9,7 +9,7 @@
       )"
       :key="index"
     >
-      <NuxtLink :to="'/offer/'+item.primaryKey+'/1'">
+      <NuxtLink :to="`/offer/${item.primaryKey}/1`">
         {{ item.attributes.name }}
       </NuxtLink>
     </li>

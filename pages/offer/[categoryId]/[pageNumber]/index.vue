@@ -1,10 +1,10 @@
 <template>
   <div>
-    <NavContainer :categoryId="categoryId" />
+    <NavContainer :categoryId="parseInt(categoryId)" />
     <Splitter>
       <SplitterPanel :size="25" :minSize="10">
-        <BrandSelector :category-id="categoryId" />
-        <PropertiesSelector :category-id="categoryId" />
+        <BrandSelector :category-id="parseInt(categoryId)" />
+        <PropertiesSelector :category-id="parseInt(categoryId)" />
       </SplitterPanel>
       <SplitterPanel :size="75">
         <DataView
@@ -30,7 +30,7 @@
                   :class="{ 'border-top-1 surface-border': index !== 0 }"
                 >
                   <NuxtImg
-                    :src="'https://picsum.photos/250/250?random=' + index"
+                    :src="`https://picsum.photos/250/250?random=${index}`"
                     placeholder
                     class="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round"
                   />
@@ -88,7 +88,7 @@
                   </div>
                   <div class="flex flex-column align-items-center gap-3 py-5">
                     <NuxtImg
-                      :src="'https://picsum.photos/250/250?random=' + index"
+                      :src="`https://picsum.photos/250/250?random=${index}`"
                       placeholder
                       class="w-9 shadow-2 border-round"
                     />

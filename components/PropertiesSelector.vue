@@ -7,7 +7,12 @@
 </template>
 
 <script setup lang="ts">
-const { categoryId } = defineProps(["categoryId"]);
+const { categoryId } = defineProps({
+  categoryId: {
+    type: Number,
+    required: true,
+  },
+});
 
 const getParametrs = gql`
   query getParametrs($categoryId: [Int!]) {
@@ -91,7 +96,7 @@ type ListProperty = {
 };
 
 const { data } = await useAsyncQuery<ListProperty>(getParametrs, {
-  categoryId: parseInt(categoryId),
+  categoryId: categoryId,
 });
 
 const nodes = () => {

@@ -1,15 +1,17 @@
 <template>
   <div>
     <p>Brand</p>
-    <Tree
-      :value="nodes()"
-      selectionMode="checkbox"
-    ></Tree>
+    <Tree :value="nodes()" selectionMode="checkbox"></Tree>
   </div>
 </template>
 
 <script setup lang="ts">
-const { categoryId } = defineProps(["categoryId"]);
+const { categoryId } = defineProps({
+  categoryId: {
+    type: Number,
+    required: true,
+  },
+});
 
 const queryPage = gql`
   query getBrands($categoryId: [Int!]) {
@@ -60,7 +62,7 @@ type ListBrand = {
   };
 };
 const { data } = await useAsyncQuery<ListBrand>(queryPage, {
-  categoryId: parseInt(categoryId),
+  categoryId: categoryId,
 });
 
 const nodes = () => {
