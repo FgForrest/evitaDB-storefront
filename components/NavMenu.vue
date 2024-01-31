@@ -1,22 +1,45 @@
 <template>
-  <ul>
-    <li>
-      <NuxtLink to="/">Home</NuxtLink>
-    </li>
-    <li
-      v-for="(item, index) in data.listCategory.filter(
-        (x) => !x.parentPrimaryKey
-      )"
-      :key="index"
-    >
-      <NuxtLink :to="`/offer/${item.primaryKey}/1`">
-        {{ item.attributes.name }}
+  <Menubar :model="getItems()">
+    <template #start>
+      <object width="35" height="40" data="/no-image.svg"></object>
+    </template>
+    <template #item="{ item, props, hasSubmenu, root }">
+      <NuxtLink
+        :to="item.link"
+        v-ripple
+        class="flex align-items-center"
+        v-bind="props.action"
+      >
+        <span :class="item.icon" />
+        <span class="ml-2">{{ item.label }}</span>
+        <Badge
+          v-if="item.badge"
+          :class="{ 'ml-auto': !root, 'ml-2': root }"
+          :value="item.badge"
+        />
+        <span
+          v-if="item.shortcut"
+          class="ml-auto border-1 surface-border border-round surface-100 text-xs p-1"
+          >{{ item.shortcut }}</span
+        >
+        <i
+          v-if="hasSubmenu"
+          :class="[
+            'pi pi-angle-down',
+            { 'pi-angle-down ml-2': root, 'pi-angle-right ml-auto': !root },
+          ]"
+        ></i>
       </NuxtLink>
-    </li>
-  </ul>
+    </template>
+    <template #end>
+      <div class="flex align-items-center gap-2">
+        <InputText placeholder="Search" type="text" class="w-8rem sm:w-auto" />
+      </div>
+    </template>
+  </Menubar>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 const query = gql`
   query {
     listCategory(filterBy: { entityLocaleEquals: en }) {
@@ -28,7 +51,48 @@ const query = gql`
     }
   }
 `;
-const { data } = await useAsyncQuery(query);
+
+type ListCategory = {
+  listCategory: {
+    primaryKey: number;
+    parentPrimaryKey: number;
+    attributes: {
+      name: string;
+    };
+  }[];
+};
+
+const { data } = await useAsyncQuery<ListCategory>(query);
+
+function getItems(): Object[] {
+  const menuItems: Object[] = [];
+  menuItems.push({
+    label: "Home",
+    icon: "pi pi-home",
+    link: "/",
+  });
+  for (const menuItem of data.value.listCategory.filter(
+    (x) => !x.parentPrimaryKey
+  )) {
+    const subItemsNames = data.value.listCategory.filter(
+      (x) => x.parentPrimaryKey === menuItem.primaryKey
+    );
+    const subItems: Object[] = [];
+    for (const subItem of subItemsNames) {
+      subItems.push({
+        label: subItem.attributes.name,
+        icon: `pi pi-${subItem.attributes.name.replace("s", "")}`,
+        link: `/offer/${subItem.primaryKey}/1`,
+      });
+    }
+    if (subItems.length > 0) {
+      menuItems.push({ label: menuItem.attributes.name, items: subItems });
+    } else {
+      menuItems.push({ label: menuItem.attributes.name });
+    }
+  }
+  return menuItems;
+}
 </script>
 
 <style scoped>
