@@ -1,11 +1,12 @@
 <template>
   <div>
     <p>Brand</p>
-    <Tree :value="nodes()" selectionMode="checkbox"></Tree>
+    <Tree  v-model:selectionKeys="selectedKey" :value="nodes()" selectionMode="checkbox"></Tree>
   </div>
 </template>
 
 <script setup lang="ts">
+const selectedKey = ref<any>(null);
 const { categoryId } = defineProps({
   categoryId: {
     type: Number,
