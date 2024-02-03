@@ -1,11 +1,11 @@
 <template>
   <div class="links">
     <NavCard
-      v-for="(item, index) in data.listCategory.filter(
+      v-for="(item, index) in data?.listCategory.filter(
         (x) => x.parentPrimaryKey !== null
       )"
       :key="`card-${index}`"
-      :name="item.attributes.name"
+      :name="item.attributes ? (item.attributes.name) : ''"
       :primaryKey="item.primaryKey"
       class="card"
     />
@@ -13,41 +13,16 @@
 </template>
 
 <script lang="ts" setup>
+import { useGetCategoryQuery } from "~/generated/operations";
+
 const { categoryId } = defineProps({
   categoryId: {
     type: Number,
     required: true,
   },
 });
-const query = gql`
-  query getCategory($categoryId: [Int!]) {
-    listCategory(
-      filterBy: {
-        hierarchyWithinSelf: {
-          ofParent: { entityPrimaryKeyInSet: $categoryId }
-          with: { excludingRoot: true }
-        }
-        entityLocaleEquals: en
-      }
-    ) {
-      parentPrimaryKey
-      primaryKey
-      attributes {
-        name
-      }
-    }
-  }
-`;
-type ListCategory = {
-  listCategory: {
-    primaryKey: number;
-    parentPrimaryKey: number;
-    attributes: {
-      name: string;
-    };
-  }[];
-};
-const { data } = await useAsyncQuery<ListCategory>(query, {
+
+const { result:data } = useGetCategoryQuery({
   categoryId: categoryId,
 });
 </script>

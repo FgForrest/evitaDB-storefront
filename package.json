@@ -10,9 +10,15 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
+    "@graphql-codegen/typescript-vue-apollo": "^4.1.1",
     "@nuxt/devtools": "latest",
     "@nuxt/image": "^1.1.0",
+    "@nuxt3/graphql-codegen-module": "^0.0.7",
     "@nuxtjs/apollo": "^5.0.0-alpha.10",
+    "graphql": "^16.8.1",
     "nuxt": "^3.8.2",
     "nuxt-primevue": "^0.2.2",
     "vue": "^3.3.10",

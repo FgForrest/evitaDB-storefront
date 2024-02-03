@@ -1,0 +1,17 @@
+query getCategory($categoryId: [Int!]) {
+  listCategory(
+    filterBy: {
+      hierarchyWithinSelf: {
+        ofParent: { entityPrimaryKeyInSet: $categoryId }
+        with: { excludingRoot: true }
+      }
+      entityLocaleEquals: en
+    }
+  ) {
+    parentPrimaryKey
+    primaryKey
+    attributes {
+      name
+    }
+  }
+}

@@ -1,0 +1,26 @@
+query getBrands($categoryId: [Int!]) {
+  queryProduct(
+    filterBy: {
+      hierarchyCategoriesWithin: {
+        ofParent: { entityPrimaryKeyInSet: $categoryId }
+      }
+      entityLocaleEquals: en
+    }
+  ) {
+    extraResults {
+      facetSummary {
+        brand {
+          count
+          facetStatistics {
+            facetEntity {
+              primaryKey
+              attributes {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

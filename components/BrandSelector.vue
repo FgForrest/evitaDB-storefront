@@ -1,11 +1,15 @@
 <template>
-  <div>
-    <p>Brand</p>
-    <Tree  v-model:selectionKeys="selectedKey" :value="nodes()" selectionMode="checkbox"></Tree>
-  </div>
+  <p class="title">Brand</p>
+  <Tree
+    v-model:selectionKeys="selectedKey"
+    :value="nodes()"
+    selectionMode="checkbox"
+    class="no-border"
+  ></Tree>
 </template>
 
 <script setup lang="ts">
+import { useGetBrandsQuery } from "../generated/operations";
 const selectedKey = ref<any>(null);
 const { categoryId } = defineProps({
   categoryId: {
@@ -14,71 +18,34 @@ const { categoryId } = defineProps({
   },
 });
 
-const queryPage = gql`
-  query getBrands($categoryId: [Int!]) {
-    queryProduct(
-      filterBy: {
-        hierarchyCategoriesWithin: {
-          ofParent: { entityPrimaryKeyInSet: $categoryId }
-        }
-        entityLocaleEquals: en
-      }
-    ) {
-      extraResults {
-        facetSummary {
-          brand {
-            count
-            facetStatistics {
-              facetEntity {
-                primaryKey
-                attributes {
-                  name
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-type ListBrand = {
-  queryProduct: {
-    extraResults: {
-      facetSummary: {
-        brand: {
-          count: number;
-          facetStatistics: {
-            facetEntity: {
-              primaryKey: number;
-              attributes: {
-                name: String;
-              };
-            };
-          }[];
-        };
-      };
-    };
-  };
-};
-const { data } = await useAsyncQuery<ListBrand>(queryPage, {
+const { result } = await useGetBrandsQuery({
   categoryId: categoryId,
 });
 
 const nodes = () => {
   const brands: Object[] = [];
   const rawBrands =
-    data.value.queryProduct.extraResults.facetSummary.brand.facetStatistics;
-  for (let i = 0; i < rawBrands.length; i++) {
-    brands.push({
-      key: i,
-      label: rawBrands[i].facetEntity.attributes.name,
-      data: rawBrands[i].facetEntity.attributes.name,
-    });
+    result.value?.queryProduct.extraResults.facetSummary?.brand
+      ?.facetStatistics;
+  if (rawBrands) {
+    for (let i = 0; i < rawBrands.length; i++) {
+      brands.push({
+        key: i,
+        label: rawBrands[i].facetEntity?.attributes?.name,
+        data: rawBrands[i].facetEntity?.attributes?.name,
+      });
+    }
   }
   return brands;
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.no-border {
+  border: 0px solid transparent;
+}
+.title {
+  font-weight: bold;
+  text-align: center;
+}
+</style>

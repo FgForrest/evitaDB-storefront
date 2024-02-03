@@ -1,0 +1,40 @@
+query getParametrs($categoryId: [Int!]) {
+  queryProduct(
+    filterBy: {
+      hierarchyCategoriesWithin: {
+        ofParent: { entityPrimaryKeyInSet: $categoryId }
+      }
+      entityLocaleEquals: en
+    }
+  ) {
+    extraResults {
+      facetSummary {
+        parameterValues {
+          count
+          groupEntity {
+            primaryKey
+            attributes {
+              code
+              name
+            }
+          }
+          facetStatistics {
+            requested
+            impact {
+              difference
+              hasSense
+              matchCount
+            }
+            facetEntity {
+              primaryKey
+              attributes {
+                code
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

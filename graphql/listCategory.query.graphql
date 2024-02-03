@@ -1,0 +1,9 @@
+query listCategory {
+  listCategory(filterBy: { entityLocaleEquals: en }) {
+    primaryKey
+    parentPrimaryKey
+    attributes {
+      name
+    }
+  }
+}

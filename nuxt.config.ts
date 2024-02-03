@@ -14,7 +14,10 @@ export default defineNuxtConfig({
     "primeflex/primeflex.css",
   ],
   devtools: { enabled: true },
-  modules: ["@nuxtjs/apollo", "nuxt-primevue", "@nuxt/image"],
+  modules: ["@nuxtjs/apollo", "nuxt-primevue", "@nuxt/image", "@nuxt3/graphql-codegen-module"],
+  graphqlCodegen: {
+    schema: ["https://demo.evitadb.io:5555/gql/evita"]
+  },
   apollo: {
     clients: {
       default: {
@@ -25,4 +28,7 @@ export default defineNuxtConfig({
   alias: {
     "@": resolve(__dirname, "/"),
   },
+  plugins: [
+    '~/plugins/apollo-client.js'
+  ],
 });

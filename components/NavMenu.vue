@@ -40,29 +40,9 @@
 </template>
 
 <script lang="ts" setup>
-const query = gql`
-  query {
-    listCategory(filterBy: { entityLocaleEquals: en }) {
-      primaryKey
-      parentPrimaryKey
-      attributes {
-        name
-      }
-    }
-  }
-`;
+import { useListCategoryQuery } from "../generated/operations";
 
-type ListCategory = {
-  listCategory: {
-    primaryKey: number;
-    parentPrimaryKey: number;
-    attributes: {
-      name: string;
-    };
-  }[];
-};
-
-const { data } = await useAsyncQuery<ListCategory>(query);
+const { result: data } = useListCategoryQuery();
 
 function getItems(): Object[] {
   const menuItems: Object[] = [];
@@ -71,24 +51,26 @@ function getItems(): Object[] {
     icon: "pi pi-home",
     link: "/",
   });
-  for (const menuItem of data.value.listCategory.filter(
-    (x) => !x.parentPrimaryKey
-  )) {
-    const subItemsNames = data.value.listCategory.filter(
-      (x) => x.parentPrimaryKey === menuItem.primaryKey
-    );
-    const subItems: Object[] = [];
-    for (const subItem of subItemsNames) {
-      subItems.push({
-        label: subItem.attributes.name,
-        icon: `pi pi-${subItem.attributes.name.replace("s", "")}`,
-        link: `/offer/${subItem.primaryKey}/1`,
-      });
-    }
-    if (subItems.length > 0) {
-      menuItems.push({ label: menuItem.attributes.name, items: subItems });
-    } else {
-      menuItems.push({ label: menuItem.attributes.name });
+  if (data.value) {
+    for (const menuItem of data.value?.listCategory.filter(
+      (x) => !x.parentPrimaryKey
+    )) {
+      const subItemsNames = data.value?.listCategory.filter(
+        (x) => x.parentPrimaryKey === menuItem.primaryKey
+      );
+      const subItems: Object[] = [];
+      for (const subItem of subItemsNames) {
+        subItems.push({
+          label: subItem?.attributes?.name,
+          icon: `pi pi-${subItem?.attributes?.name.replace("s", "")}`,
+          link: `/offer/${subItem.primaryKey}/1`,
+        });
+      }
+      if (subItems.length > 0) {
+        menuItems.push({ label: menuItem.attributes?.name, items: subItems });
+      } else {
+        menuItems.push({ label: menuItem?.attributes?.name });
+      }
     }
   }
   return menuItems;
