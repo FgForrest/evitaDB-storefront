@@ -1,7 +1,9 @@
 <template>
   <div>
     <NavMenu />
-    <slot />
+    <div>
+      <slot />
+    </div>
     <Footer />
   </div>
 </template>

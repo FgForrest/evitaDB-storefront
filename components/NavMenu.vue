@@ -1,48 +1,54 @@
 <template>
-  <Menubar :model="getItems()">
-    <template #start>
-      <object width="35" height="40" data="/no-image.svg"></object>
-    </template>
-    <template #item="{ item, props, hasSubmenu, root }">
-      <NuxtLink
-        :to="item.link"
-        v-ripple
-        class="flex align-items-center"
-        v-bind="props.action"
-      >
-        <span :class="item.icon" />
-        <span class="ml-2">{{ item.label }}</span>
-        <Badge
-          v-if="item.badge"
-          :class="{ 'ml-auto': !root, 'ml-2': root }"
-          :value="item.badge"
-        />
-        <span
-          v-if="item.shortcut"
-          class="ml-auto border-1 surface-border border-round surface-100 text-xs p-1"
-          >{{ item.shortcut }}</span
+  <div>
+    <Menubar v-if="data && data.listCategory && !loading" :model="getItems()">
+      <template #start>
+        <object width="35" height="40" data="/no-image.svg"></object>
+      </template>
+      <template #item="{ item, props, hasSubmenu, root }">
+        <NuxtLink
+          :to="item.link"
+          v-ripple
+          class="flex align-items-center"
+          v-bind="props.action"
         >
-        <i
-          v-if="hasSubmenu"
-          :class="[
-            'pi pi-angle-down',
-            { 'pi-angle-down ml-2': root, 'pi-angle-right ml-auto': !root },
-          ]"
-        ></i>
-      </NuxtLink>
-    </template>
-    <template #end>
-      <div class="flex align-items-center gap-2">
-        <InputText placeholder="Search" type="text" class="w-8rem sm:w-auto" />
-      </div>
-    </template>
-  </Menubar>
+          <span :class="item.icon"></span>
+          <span class="ml-2">{{ item.label }}</span>
+          <Badge
+            v-if="item.badge"
+            :class="{ 'ml-auto': !root, 'ml-2': root }"
+            :value="item.badge"
+          />
+          <span
+            v-if="item.shortcut"
+            class="ml-auto border-1 surface-border border-round surface-100 text-xs p-1"
+            >{{ item.shortcut }}</span
+          >
+          <i
+            v-if="hasSubmenu"
+            :class="[
+              'pi pi-angle-down',
+              { 'pi-angle-down ml-2': root, 'pi-angle-right ml-auto': !root },
+            ]"
+          ></i>
+        </NuxtLink>
+      </template>
+      <template #end>
+        <div class="flex align-items-center gap-2">
+          <InputText
+            placeholder="Search"
+            type="text"
+            class="w-8rem sm:w-auto"
+          />
+        </div>
+      </template>
+    </Menubar>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { useListCategoryQuery } from "../generated/operations";
 
-const { result: data } = useListCategoryQuery();
+const { result: data, loading } = useListCategoryQuery();
 
 function getItems(): Object[] {
   const menuItems: Object[] = [];

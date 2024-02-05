@@ -18,6 +18,7 @@
     "@nuxt/image": "^1.1.0",
     "@nuxt3/graphql-codegen-module": "^0.0.7",
     "@nuxtjs/apollo": "^5.0.0-alpha.10",
+    "@nuxtjs/html-validator": "^1.6.0",
     "graphql": "^16.8.1",
     "nuxt": "^3.8.2",
     "nuxt-primevue": "^0.2.2",
