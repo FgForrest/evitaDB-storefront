@@ -1,15 +1,13 @@
 <template>
   <p class="title">Properties</p>
   <Tree
-    :value="nodes()"
+    :value="getNodes()"
     selectionMode="checkbox"
     class="w-full md:w-30rem no-border"
   ></Tree>
 </template>
 
 <script setup lang="ts">
-import { useGetParametrsQuery } from "~/generated/operations";
-
 const { categoryId } = defineProps({
   categoryId: {
     type: Number,
@@ -17,11 +15,8 @@ const { categoryId } = defineProps({
   },
 });
 
-const { result: data } = useGetParametrsQuery({
-  categoryId: categoryId,
-});
-
-const nodes = () => {
+const { data } = await useAsyncGql("getParametrs", { categoryId: categoryId });
+const getNodes = () => {
   const properties: Object[] = [];
   const rawProperties =
     data.value?.queryProduct.extraResults.facetSummary?.parameterValues;

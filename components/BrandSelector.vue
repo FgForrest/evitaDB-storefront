@@ -2,14 +2,13 @@
   <p class="title">Brand</p>
   <Tree
     v-model:selectionKeys="selectedKey"
-    :value="nodes()"
+    :value="getNodes()"
     selectionMode="checkbox"
     class="no-border"
   ></Tree>
 </template>
 
 <script setup lang="ts">
-import { useGetBrandsQuery } from "../generated/operations";
 const selectedKey = ref<any>(null);
 const { categoryId } = defineProps({
   categoryId: {
@@ -18,15 +17,12 @@ const { categoryId } = defineProps({
   },
 });
 
-const { result } = await useGetBrandsQuery({
-  categoryId: categoryId,
-});
+const { data } = await useAsyncGql("getBrands", { categoryId: categoryId });
 
-const nodes = () => {
-  const brands: Object[] = [];
+const getNodes = () => {
+  const brands: object[] = [];
   const rawBrands =
-    result.value?.queryProduct.extraResults.facetSummary?.brand
-      ?.facetStatistics;
+    data.value?.queryProduct.extraResults.facetSummary?.brand?.facetStatistics;
   if (rawBrands) {
     for (let i = 0; i < rawBrands.length; i++) {
       brands.push({

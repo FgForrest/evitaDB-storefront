@@ -1,0 +1,35 @@
+query getProducts($categoryId: [Int!], $page: Int!) {
+  queryProduct(
+    filterBy: {
+      hierarchyCategoriesWithin: {
+        ofParent: { entityPrimaryKeyInSet: $categoryId }
+      }
+      entityLocaleEquals: en
+      priceInPriceLists: ["basic"]
+      priceInCurrency: EUR
+    }
+  ) {
+    recordPage(number: $page, size: 50) {
+      data {
+        primaryKey
+        attributes {
+          name
+          brandCode
+        }
+        categories {
+          referencedEntity {
+            attributes {
+              name
+            }
+          }
+        }
+        priceForSale {
+          priceWithoutTax
+          priceWithTax
+          taxRate
+        }
+      }
+      lastPageNumber
+    }
+  }
+}

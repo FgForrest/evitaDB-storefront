@@ -13,8 +13,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useGetCategoryQuery } from "~/generated/operations";
-
 const { categoryId } = defineProps({
   categoryId: {
     type: Number,
@@ -22,9 +20,7 @@ const { categoryId } = defineProps({
   },
 });
 
-const { result:data } = useGetCategoryQuery({
-  categoryId: categoryId,
-});
+const {data} = await useAsyncGql("getSubcategory", {categoryId: categoryId})
 </script>
 
 <style scoped>

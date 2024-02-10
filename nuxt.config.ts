@@ -2,6 +2,9 @@
 import { resolve } from "path";
 
 export default defineNuxtConfig({
+  typescript: {
+    typeCheck: true
+  },
   primevue: {
     usePrimeVue: true,
     options: {
@@ -14,21 +17,22 @@ export default defineNuxtConfig({
     "primeflex/primeflex.css",
   ],
   devtools: { enabled: true },
-  modules: ["@nuxtjs/apollo", "nuxt-primevue", "@nuxt/image", "@nuxt3/graphql-codegen-module"],
-  graphqlCodegen: {
-    schema: ["https://demo.evitadb.io:5555/gql/evita"]
+  modules: [
+    "nuxt-graphql-client",
+    "nuxt-primevue",
+    "@nuxt/image",
+  ],
+  "graphql-client": {
+    codegen: {
+      avoidOptionals: true
+    }
   },
-  apollo: {
-    clients: {
-      default: {
-        httpEndpoint: "https://demo.evitadb.io:5555/gql/evita",
-      },
+  runtimeConfig: {
+    public: {
+      GQL_HOST: "https://demo.evitadb.io:5555/gql/evita", // overwritten by process.env.GQL_HOST
     },
   },
   alias: {
     "@": resolve(__dirname, "/"),
-  },
-  plugins: [
-    '~/plugins/apollo-client.js'
-  ],
+  }
 });

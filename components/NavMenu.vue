@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Menubar v-if="data && data.listCategory && !loading" :model="getItems()">
+    <Menubar v-if="data && data.listCategory" :model="getItems()">
       <template #start>
         <object width="35" height="40" data="/no-image.svg"></object>
       </template>
@@ -46,9 +46,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useListCategoryQuery } from "../generated/operations";
 
-const { result: data, loading } = useListCategoryQuery();
+const { data } = await useAsyncGql("listCategory");
 
 function getItems(): Object[] {
   const menuItems: Object[] = [];
@@ -94,6 +93,7 @@ ul {
   padding-bottom: 16px;
   padding-top: 0px;
 }
+
 ul li a {
   text-decoration: none;
   color: black;
