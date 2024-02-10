@@ -2,7 +2,7 @@
   <div>
     <Menubar v-if="data && data.listCategory" :model="getItems()">
       <template #start>
-        <object width="35" height="40" data="/no-image.svg"></object>
+        <NuxtImg format="avif" height="40" src="/evitadb.png" alt="Icon EvitaDB" />
       </template>
       <template #item="{ item, props, hasSubmenu, root }">
         <NuxtLink
@@ -34,11 +34,7 @@
       </template>
       <template #end>
         <div class="flex align-items-center gap-2">
-          <InputText
-            placeholder="Search"
-            type="text"
-            class="w-8rem sm:w-auto"
-          />
+          <InputText placeholder="Search" type="text" class="w-8rem sm:w-auto" />
         </div>
       </template>
     </Menubar>
@@ -46,7 +42,6 @@
 </template>
 
 <script lang="ts" setup>
-
 const { data } = await useAsyncGql("listCategory");
 
 function getItems(): Object[] {
@@ -57,9 +52,7 @@ function getItems(): Object[] {
     link: "/",
   });
   if (data.value) {
-    for (const menuItem of data.value?.listCategory.filter(
-      (x) => !x.parentPrimaryKey
-    )) {
+    for (const menuItem of data.value?.listCategory.filter((x) => !x.parentPrimaryKey)) {
       const subItemsNames = data.value?.listCategory.filter(
         (x) => x.parentPrimaryKey === menuItem.primaryKey
       );
@@ -72,9 +65,16 @@ function getItems(): Object[] {
         });
       }
       if (subItems.length > 0) {
-        menuItems.push({ label: menuItem.attributes?.name, items: subItems });
+        menuItems.push({
+          label: menuItem.attributes?.name,
+          items: subItems,
+          link: `/offer/${menuItem.primaryKey}/1`,
+        });
       } else {
-        menuItems.push({ label: menuItem?.attributes?.name });
+        menuItems.push({
+          label: menuItem?.attributes?.name,
+          link: `/offer/${menuItem.primaryKey}/1`,
+        });
       }
     }
   }

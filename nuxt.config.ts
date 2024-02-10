@@ -3,7 +3,7 @@ import { resolve } from "path";
 
 export default defineNuxtConfig({
   typescript: {
-    typeCheck: true
+    typeCheck: true,
   },
   primevue: {
     usePrimeVue: true,
@@ -17,15 +17,11 @@ export default defineNuxtConfig({
     "primeflex/primeflex.css",
   ],
   devtools: { enabled: true },
-  modules: [
-    "nuxt-graphql-client",
-    "nuxt-primevue",
-    "@nuxt/image",
-  ],
+  modules: ["nuxt-graphql-client", "nuxt-primevue", "@nuxt/image"],
   "graphql-client": {
     codegen: {
-      avoidOptionals: true
-    }
+      avoidOptionals: true,
+    },
   },
   runtimeConfig: {
     public: {
@@ -34,5 +30,8 @@ export default defineNuxtConfig({
   },
   alias: {
     "@": resolve(__dirname, "/"),
-  }
+  },
+  image: {
+    dir: "assets/images",
+  },
 });

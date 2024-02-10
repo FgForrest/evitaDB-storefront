@@ -1,0 +1,14 @@
+query getGroups {
+  queryGroup(filterBy: {
+    entityLocaleEquals: en
+  }) {
+    recordPage{
+      data {
+        primaryKey
+        attributes {
+          name
+        }
+      }
+    }
+  }
+}

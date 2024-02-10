@@ -1,0 +1,18 @@
+query getSpecialItems($groupId: [Int!]) {
+  queryProduct(
+    filterBy: {
+      facetGroupsHaving: { entityPrimaryKeyInSet: $groupId }
+      entityLocaleEquals: en
+    }
+  ) {
+    recordPage {
+      data {
+        primaryKey
+        attributes {
+          name
+          brandCode
+        }
+      }
+    }
+  }
+}
