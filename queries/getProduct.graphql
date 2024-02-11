@@ -1,0 +1,26 @@
+query getProduct($productId: Int!) {
+  getProduct(primaryKey: $productId, locale: en) {
+    attributes {
+      name
+      description
+      descriptionShort
+      availability
+      batteryCapacity
+      batteryLife
+      batteryLifeCase
+      batteryLifeHeadset
+      brandCode
+      catalogNumber
+      code
+      connectionLength
+      cpuFrequency
+      depth
+      depthInMm
+      depthSourceA
+      displaySize
+      ean
+      frequencyFrom
+      productType
+    }
+  }
+}

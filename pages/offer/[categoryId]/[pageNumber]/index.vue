@@ -37,7 +37,9 @@
                       class="flex flex-column align-items-center sm:align-items-start gap-3"
                     >
                       <div class="text-2xl font-bold text-900">
-                        {{ item.attributes.name }}
+                        <NuxtLink :to="`/detail/${item.primaryKey}`" class="link">{{
+                          item.attributes.name
+                        }}</NuxtLink>
                       </div>
                       <div class="flex align-items-center gap-3">
                         <span class="flex align-items-center gap-2">
@@ -85,7 +87,9 @@
                       class="w-9 shadow-2 border-round"
                     />
                     <div class="text-2xl font-bold">
-                      {{ item.attributes.name }}
+                      <NuxtLink :to="`/detail/${item.primaryKey}`" class="link">{{
+                        item.attributes.name
+                      }}</NuxtLink>
                     </div>
                   </div>
                   <div class="flex align-items-center justify-content-between">
@@ -122,4 +126,9 @@ const { data } = await useAsyncGql("getProducts", {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.link {
+  text-decoration: none;
+  color: black;
+}
+</style>

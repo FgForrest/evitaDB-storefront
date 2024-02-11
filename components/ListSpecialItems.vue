@@ -10,7 +10,7 @@
         <div class="mb-3">
           <div class="relative mx-auto">
             <img
-              :src="`https://picsum.photos/250/250?random=${item.data.primaryKey}`"
+              :src="`https://picsum.photos/250/150?random=${item.data.primaryKey}`"
               :alt="item.data.attributes.name"
               class="w-full border-round"
             />
