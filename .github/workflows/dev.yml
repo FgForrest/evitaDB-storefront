@@ -1,0 +1,30 @@
+name: Dev
+
+on:
+  push:
+    branches:
+      - dev
+
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}  # for the same branch (dev or PR)
+  cancel-in-progress: true        # run only one workflow at a time (cancel the previous)
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.18.0'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
