@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Card> </Card>
     <Card
       v-for="(item, index) in data.queryGroup.recordPage.data"
       :key="item.primaryKey"

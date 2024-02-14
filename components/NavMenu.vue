@@ -68,7 +68,6 @@ function getItems(): Object[] {
         menuItems.push({
           label: menuItem.attributes?.name,
           items: subItems,
-          link: `/offer/${menuItem.primaryKey}/1`,
         });
       } else {
         menuItems.push({

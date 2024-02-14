@@ -11,6 +11,6 @@ COPY . /src
 
 RUN npm run build
 
-ENV HOST=0.0.0.0 PORT=8080 NODE_ENV=production
+ENV HOST=0.0.0.0 PORT=5559 NODE_ENV=production
 
 CMD [ "node", ".output/server/index.mjs" ]
