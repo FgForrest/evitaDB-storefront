@@ -2,9 +2,6 @@
 import { resolve } from "path";
 
 export default defineNuxtConfig({
-  typescript: {
-    typeCheck: true,
-  },
   primevue: {
     usePrimeVue: true,
     options: {
