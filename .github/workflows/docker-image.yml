@@ -33,36 +33,14 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository | lower }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-jobs:
-  build-and-release:
-    name: Build and release
-    permissions:
-      # write permission is required to create a github release
-      contents: write
-
-      # write permission is required for autolabeler
-      # otherwise, read permission is required at least
-      pull-requests: write
-    outputs:
-      release_id: ${{ steps.create_release.outputs.id }}
-      released_version: ${{ steps.release_version.outputs.version }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Build docker image
-        uses: actions/checkout@v3
-        with:
-          script: |
-            docker build .
-      
+jobs:    
   build-and-release-docker:
     name: Build and release Docker image
     permissions:
       packages: write
-    needs: build-and-release
     runs-on: ubuntu-latest
 
     steps:
@@ -91,4 +69,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build-and-release.outputs.released_version }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.release_version.outputs.version }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
