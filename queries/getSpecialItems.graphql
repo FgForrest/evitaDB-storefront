@@ -2,7 +2,9 @@ query getSpecialItems($groupId: [Int!]) {
   queryProduct(
     filterBy: {
       facetGroupsHaving: { entityPrimaryKeyInSet: $groupId }
-      entityLocaleEquals: en
+      entityLocaleEquals: en,
+      priceInPriceLists: ["basic"],
+      priceInCurrency: CZK
     }
   ) {
     recordPage {
@@ -11,6 +13,10 @@ query getSpecialItems($groupId: [Int!]) {
         attributes {
           name
           brandCode
+        }
+        priceForSale {
+          priceWithTax
+          priceWithoutTax
         }
       }
     }

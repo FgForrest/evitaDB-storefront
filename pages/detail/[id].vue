@@ -21,11 +21,19 @@
             </template>
           </Galleria>
           <div>
-            <p>{{ data.getProduct.attributes.name }}</p>
+            <h2>{{ data.getProduct.attributes.name }}</h2>
+            <p>{{ data.getProduct.attributes.descriptionShort }}</p>
+            <p>{{ data.getProduct.attributes.description }}</p>
           </div>
         </div>
       </template>
     </Card>
+    <div>
+      <DataTable :value="getProperties()" stripedRows tableStyle="min-width: 50rem">
+        <Column field="name" header="Název"></Column>
+        <Column field="value" header="Hodnota"></Column>
+      </DataTable>
+    </div>
   </div>
 </template>
 
@@ -57,6 +65,14 @@ function getImages(): object[] {
     });
   }
   return data;
+}
+
+function getProperties(): object[] {
+  const result: object[] = [];
+  for (const prop in data.value.getProduct.attributes) {
+    result.push({ name: prop, value: data.value.getProduct.attributes[prop] });
+  }
+  return result;
 }
 </script>
 
