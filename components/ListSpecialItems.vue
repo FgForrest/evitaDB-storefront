@@ -25,8 +25,7 @@
         <div class="mb-3 font-medium">{{ item.data.attributes.name }}</div>
         <div class="flex justify-content-between align-items-center">
           <div class="mt-0 font-semibold text-xl">
-            <!--{{ item.data.priceForSale.priceWithTax }}-->
-            20,-Kč
+            {{ item.data.priceForSale.priceWithTax }},-Kč
           </div>
           <span>
             <Button icon="pi pi-heart" severity="secondary" outlined />
