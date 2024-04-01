@@ -12,6 +12,7 @@
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "@nuxt/image": "^1.1.0",
+    "eslint": "^8.56.0",
     "nuxt": "^3.8.2",
     "nuxt-primevue": "^0.2.2",
     "typescript": "^4.9.5",

@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   css: [
     "primevue/resources/themes/lara-light-green/theme.css",
     "primeicons/primeicons.css",
-    "primeflex/primeflex.css",
+    "primeflex/primeflex.css"
   ],
   devtools: { enabled: true },
   modules: ["nuxt-graphql-client", "nuxt-primevue", "@nuxt/image"],
