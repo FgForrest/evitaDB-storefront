@@ -39,13 +39,6 @@
       </template>
       <template #end>
         <div class="flex align-items-center gap-2">
-          <InputText
-            placeholder="Search"
-            type="text"
-            class="w-8rem sm:w-auto"
-          />
-          <Avatar image="/person.svg" shape="circle" />
-          <i class="pi pi-shopping-cart icon"></i>
         </div>
       </template>
     </Menubar>

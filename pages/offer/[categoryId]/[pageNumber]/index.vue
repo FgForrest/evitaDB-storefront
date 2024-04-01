@@ -63,7 +63,6 @@
                         <span class="text-2xl font-semibold">{{
                           item.priceForSale.priceWithTax
                         }}</span>
-                        <Button icon="pi pi-shopping-cart" rounded></Button>
                       </div>
                     </div>
                   </div>
@@ -109,7 +108,6 @@
                       <span class="text-2xl font-semibold"
                         >{{ item.priceForSale.priceWithTax }} EUR</span
                       >
-                      <Button icon="pi pi-shopping-cart" rounded></Button>
                     </div>
                   </div>
                 </NuxtLink>
