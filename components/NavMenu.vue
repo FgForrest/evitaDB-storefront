@@ -2,7 +2,12 @@
   <div>
     <Menubar v-if="data && data.listCategory" :model="getItems()">
       <template #start>
-        <NuxtImg format="avif" height="40" src="/evitadb.png" alt="Icon EvitaDB" />
+        <NuxtImg
+          format="avif"
+          height="40"
+          src="/evitadb.png"
+          alt="Icon EvitaDB"
+        />
       </template>
       <template #item="{ item, props, hasSubmenu, root }">
         <NuxtLink
@@ -34,7 +39,13 @@
       </template>
       <template #end>
         <div class="flex align-items-center gap-2">
-          <InputText placeholder="Search" type="text" class="w-8rem sm:w-auto" />
+          <InputText
+            placeholder="Search"
+            type="text"
+            class="w-8rem sm:w-auto"
+          />
+          <Avatar image="/person.svg" shape="circle" />
+          <i class="pi pi-shopping-cart icon"></i>
         </div>
       </template>
     </Menubar>
@@ -44,15 +55,17 @@
 <script lang="ts" setup>
 const { data } = await useAsyncGql("listCategory");
 
-function getItems(): Object[] {
-  const menuItems: Object[] = [];
+function getItems(): object[] {
+  const menuItems: object[] = [];
   menuItems.push({
     label: "Home",
     icon: "pi pi-home",
     link: "/",
   });
   if (data.value) {
-    for (const menuItem of data.value?.listCategory.filter((x) => !x.parentPrimaryKey)) {
+    for (const menuItem of data.value?.listCategory.filter(
+      (x) => !x.parentPrimaryKey
+    )) {
       const subItemsNames = data.value?.listCategory.filter(
         (x) => x.parentPrimaryKey === menuItem.primaryKey
       );
@@ -68,7 +81,6 @@ function getItems(): Object[] {
         menuItems.push({
           label: menuItem.attributes?.name,
           items: subItems,
-          link: `/offer/${menuItem.primaryKey}/1`,
         });
       } else {
         menuItems.push({
@@ -98,5 +110,10 @@ ul li a {
   text-decoration: none;
   color: black;
   font-weight: bold;
+}
+
+.icon {
+  font-size: 1.5em;
+  color: black;
 }
 </style>

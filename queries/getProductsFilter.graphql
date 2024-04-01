@@ -1,8 +1,11 @@
-query getProducts($categoryId: [Int!], $page: Int!) {
+query getProductsFilter($categoryId: [Int!], $selectedProps: [Int!], $page: Int!) {
   queryProduct(
     filterBy: {
       hierarchyCategoriesWithin: {
         ofParent: { entityPrimaryKeyInSet: $categoryId }
+      }
+      userFilter: {
+        facetParameterValuesHaving: { entityPrimaryKeyInSet: $selectedProps }
       }
       priceInPriceLists: ["basic"]
       priceInCurrency: EUR

@@ -1,10 +1,10 @@
 <template>
   <div class="container">
     <div class="left-controls">
-      <button class="move" @click="moveStart()">
+      <button class="move" @click="moveStart()" :disabled="page === 1">
         <i class="pi pi-angle-double-left"></i>
       </button>
-      <button class="move" @click="movePrevious()">
+      <button class="move" @click="movePrevious()" :disabled="page === 1">
         <i class="pi pi-angle-left"></i>
       </button>
     </div>
@@ -18,10 +18,18 @@
       </ul>
     </div>
     <div class="right-controls">
-      <button class="move" @click="moveNext()">
+      <button
+        class="move"
+        @click="moveNext()"
+        :disabled="page === lastPageNumber"
+      >
         <i class="pi pi-angle-right"></i>
       </button>
-      <button class="move" @click="moveEnd()">
+      <button
+        class="move"
+        @click="moveEnd()"
+        :disabled="page === lastPageNumber"
+      >
         <i class="pi pi-angle-double-right"></i>
       </button>
     </div>
@@ -105,8 +113,9 @@ const getPages = () => {
 .active {
   font-weight: bold;
   border-radius: 50%;
-  background-color: #14b8a6;
-  color: white;
+  color: #ffffff;
+  background: #10b981;
+  border: 1px solid #10b981;
   display: block;
   width: 40px;
   height: 40px;
@@ -150,5 +159,8 @@ const getPages = () => {
 a {
   text-decoration: none;
   color: black;
+}
+button:disabled {
+  cursor: default;
 }
 </style>

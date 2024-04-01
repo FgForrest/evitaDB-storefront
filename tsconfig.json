@@ -1,16 +1,4 @@
 {
   // https://nuxt.com/docs/guide/concepts/typescript
-  "extends": "./.nuxt/tsconfig.json",
-  "exclude": [
-    "**/node_modules/**",
-    "./page/**/*",
-    "**/dist/**",
-    "**/assets/js/core.js",
-    "**/assets/js/v*.js",
-    "**/assets/js/gijgo*.js",
-    "**/packages/**",
-    "**/src/posts/**",
-    "**/src-posts/**",
-    "**/source/_posts/**"
-  ]
+  "extends": "./.nuxt/tsconfig.json"
 }
