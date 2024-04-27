@@ -1,0 +1,4 @@
+- name: ${api.endpoints.lab.gui.connectionName:Evita demo}
+  labApiUrl: "http://localhost:5555/lab/api"
+  gqlUrl: "http://localhost:5555/gql"
+  restUrl: "http://localhost:5555/rest"

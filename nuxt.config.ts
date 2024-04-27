@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { resolve } from "path";
+require("./tracing");
 
 export default defineNuxtConfig({
   primevue: {
@@ -19,11 +20,11 @@ export default defineNuxtConfig({
     codegen: {
       avoidOptionals: true,
     },
-  },
-  runtimeConfig: {
-    public: {
-      GQL_HOST: "https://demo.evitadb.io:5555/gql/evita", // overwritten by process.env.GQL_HOST
-    },
+    clients: {
+      default: {
+        host: 'http://evita:5555/gql/evita',
+      }
+    }
   },
   pinia: {
     storesDirs: ['./stores/**'],

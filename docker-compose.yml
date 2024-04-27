@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  evita:
+    container_name: evita-db
+    image: evitadb/evitadb:latest
+    depends_on:
+      - jaeger
+    ports:
+      - 5555:5555
+    volumes:
+      - ./data:/evita/data
+      - ./lab-connections.yaml:/evita/config/lab-connections.yaml
+    environment:
+      - EVITA_ARGS=-Dcache.enabled=false -Dapi.endpoints.observability.tracing.endpoint=http://jaeger:4318/v1/traces -Dapi.endpoints.observability.tracing.protocol=http -Dapi.endpoints.rest.enabled=true -Dapi.endpoints.system.tlsEnabled=false -Dapi.endpoints.rest.tlsEnabled=false -Dapi.endpoints.graphQL.tlsEnabled=false -Dapi.endpoints.graphQL.parallelize=false -Dapi.endpoints.lab.tlsEnabled=false -Dapi.endpoints.lab.gui.readOnly=true -Dapi.endpoints.lab.gui.preconfiguredConnections=/evita/config/lab-connections.yaml -Dapi.endpoints.lab.gui.connectionName=storefront
+  evita-storefront:
+    container_name: evita-storefront
+    depends_on:
+      - evita
+      - jaeger
+    ports:
+      - 5559:5559
+    build: 
+      context: .
+    restart: always
+    command: ./wait-for-http.sh
+  jaeger:
+    image: jaegertracing/all-in-one:1.56
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+    environment:
+      - LOG_LEVEL=debug
