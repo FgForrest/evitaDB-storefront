@@ -64,9 +64,7 @@ function getSelectedKeys(): object {
       partialChecked: false
     }
   }
-  return {
-    /*108656: { checked: true, partialChecked: false }, 108701: { checked: true, partialChecked: false }*/
-  };
+  return selected;
 }
 
 function update(): void {

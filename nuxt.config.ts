@@ -14,7 +14,7 @@ export default defineNuxtConfig({
     "primeflex/primeflex.css"
   ],
   devtools: { enabled: true },
-  modules: ["nuxt-graphql-client", "nuxt-primevue", "@nuxt/image"],
+  modules: ["nuxt-graphql-client", "nuxt-primevue", "@nuxt/image", "@pinia/nuxt", "@pinia-plugin-persistedstate/nuxt"],
   "graphql-client": {
     codegen: {
       avoidOptionals: true,
@@ -24,6 +24,9 @@ export default defineNuxtConfig({
     public: {
       GQL_HOST: "https://demo.evitadb.io:5555/gql/evita", // overwritten by process.env.GQL_HOST
     },
+  },
+  pinia: {
+    storesDirs: ['./stores/**'],
   },
   alias: {
     "@": resolve(__dirname, "/"),
