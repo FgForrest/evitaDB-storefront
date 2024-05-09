@@ -6,7 +6,7 @@
         <BrandSelector :category-id="parseInt(categoryId)" />
         <PropertiesSelector
           :data="data.queryProduct.extraResults.facetSummary?.parameterValues"
-          :selectedProps="selectedProperties"
+          :selectedProps="getFiltersList"
           @filter="filterProperties"
         />
       </SplitterPanel>
@@ -133,19 +133,18 @@ const pageNumber = route.params.pageNumber.toString();
 
 const layout = ref<any>("grid");
 const filtersStore = useFiltersStore();
-const selectedProperties = ref<Number[]>([]);
-const { setFilter } = filtersStore;
-const { filtersList } = storeToRefs(selectedProperties);
+const { filtersList, getFiltersList } = storeToRefs(filtersStore);
 const GqlInstance = useGql();
 const data = ref<object>(await getData());
 
 async function filterProperties(selectedProps) {
-  setFilter(selectedProps);
+  getFiltersList.value = selectedProps;
+  filtersList.value = selectedProps;
   data.value = await getData();
 }
 
 async function getData() {
-  if (selectedProperties.value.length === 0) {
+  if (getFiltersList.value.length === 0) {
     return await GqlInstance("getProducts", {
       categoryId: parseInt(categoryId),
       page: parseInt(pageNumber),
@@ -154,7 +153,7 @@ async function getData() {
     return await GqlInstance("getProductsFilter", {
       categoryId: parseInt(categoryId),
       page: parseInt(pageNumber),
-      selectedProps: selectedProperties.value,
+      selectedProps: getFiltersList.value,
     });
   }
 }

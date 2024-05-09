@@ -1,22 +1,22 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
 export const useFiltersStore = defineStore({
-  id: 'filter-store',
+  id: "filter-store",
   state: () => {
     return {
       filtersList: [] as Number[],
-    }
+    };
   },
   actions: {
-    setFilter(flter: Number[]){
-        console.log(flter);
-        this.filtersList = flter;
-    }
+    setFilter(flter: Number[]) {
+      this.filtersList = flter;
+      return this.filtersList;
+    },
   },
   getters: {
-    getFiltersList: state => state.filtersList,
+    getFiltersList: (state) => state.filtersList,
   },
   persist: {
     storage: persistedState.sessionStorage,
   },
-})
+});
