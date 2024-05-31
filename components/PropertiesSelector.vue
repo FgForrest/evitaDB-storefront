@@ -13,11 +13,11 @@
 import { ref } from "vue";
 
 type Emits = {
-  (event: "filter", value: Number[]): void;
+  (event: "filter", value: Number[], names: object[]): void;
 };
 
 const emit = defineEmits<Emits>();
-const { selectedProps, data } = defineProps({
+const { selectedProps, data, names } = defineProps({
   selectedProps: {
     type: Array as () => Array<Number>,
     required: false,
@@ -25,6 +25,10 @@ const { selectedProps, data } = defineProps({
   data: {
     type: Array as () => Array<object>,
     required: true,
+  },
+  names: {
+    type: Array as () => Array<object>,
+    reqired: true,
   },
 });
 
@@ -58,10 +62,20 @@ function getNodes(): object[] {
 
 function getSelectedKeys(): object {
   let selected = {};
-  for(const num of selectedProps){
-    selected[`${num}`] = {
-      checked: true,
-      partialChecked: false
+  if (selectedProps) {
+    for (const num of selectedProps) {
+      selected[`${num}`] = {
+        checked: true,
+        partialChecked: false,
+      };
+    }
+  }
+  if (names) {
+    for (const name of names) {
+      selected[`${name.name}`] = {
+        checked: name.value.checked,
+        partialChecked: name.value.partialChecked,
+      };
     }
   }
   return selected;
@@ -69,12 +83,18 @@ function getSelectedKeys(): object {
 
 function update(): void {
   const checked: Number[] = [];
+  const namesLoc: object[] = [];
   for (const item in selectedKeys.value) {
     if (!item.includes("ignore-")) {
       checked.push(parseInt(item));
+    } else {
+      namesLoc.push({
+        name: item,
+        value: selectedKeys.value[item],
+      });
     }
   }
-  emit("filter", checked);
+  emit("filter", checked, namesLoc);
 }
 </script>
 

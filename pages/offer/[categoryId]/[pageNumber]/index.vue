@@ -7,6 +7,7 @@
         <PropertiesSelector
           :data="data.queryProduct.extraResults.facetSummary?.parameterValues"
           :selectedProps="selectedProperties"
+          :names="names"
           @filter="filterProperties"
         />
       </SplitterPanel>
@@ -126,6 +127,7 @@
 </template>
 
 <script lang="ts" setup>
+import { storeToRefs } from 'pinia'
 const route = useRoute();
 
 const categoryId = route.params.categoryId.toString();
@@ -133,14 +135,18 @@ const pageNumber = route.params.pageNumber.toString();
 
 const layout = ref<any>("grid");
 const filtersStore = useFiltersStore();
-const selectedProperties = ref<Number[]>([]);
-const { setFilter } = filtersStore;
-const { filtersList } = storeToRefs(selectedProperties);
+const { setFilter, setFilterNames } = filtersStore;
+const { getFiltersList, getTopFilterNames } = storeToRefs(filtersStore);
 const GqlInstance = useGql();
+const selectedProperties = ref<Number[]>(getFiltersList);
+const names = ref<object[]>(getTopFilterNames);
 const data = ref<object>(await getData());
 
-async function filterProperties(selectedProps) {
+async function filterProperties(selectedProps:Number[], namesInput:object[]) {
   setFilter(selectedProps);
+  setFilterNames(names);
+  selectedProperties.value = selectedProps;
+  names.value = namesInput;
   data.value = await getData();
 }
 
