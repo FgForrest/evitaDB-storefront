@@ -14,7 +14,6 @@ export const useFiltersStore = defineStore({
     },
     setFilterNames(filterNames: object[]){
       this.topFilterNames = filterNames;
-      console.log(this.topFilterNames);
     },
   },
   getters: {
