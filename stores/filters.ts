@@ -6,6 +6,7 @@ export const useFiltersStore = defineStore({
     return {
       filtersList: [] as Number[],
       topFilterNames: [] as object[],
+      urlId: '' as string,
     }
   },
   actions: {
@@ -15,10 +16,14 @@ export const useFiltersStore = defineStore({
     setFilterNames(filterNames: object[]){
       this.topFilterNames = filterNames;
     },
+    setUrlId(pageUrlId: string){
+      this.urlId = pageUrlId;
+    }
   },
   getters: {
     getFiltersList: state => state.filtersList,
     getTopFilterNames: state => state.topFilterNames,
+    getUrlId: state => state.urlId,
   },
   persist: {
     storage: persistedState.sessionStorage,

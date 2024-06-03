@@ -135,12 +135,18 @@ const pageNumber = route.params.pageNumber.toString();
 
 const layout = ref<any>("grid");
 const filtersStore = useFiltersStore();
-const { setFilter, setFilterNames } = filtersStore;
-const { getFiltersList, getTopFilterNames } = storeToRefs(filtersStore);
+const { setFilter, setFilterNames, setUrlId } = filtersStore;
+const { getFiltersList, getTopFilterNames, getUrlId } = storeToRefs(filtersStore);
 const GqlInstance = useGql();
-const selectedProperties = ref<Number[]>(getFiltersList);
-const names = ref<object[]>(getTopFilterNames);
+const selectedProperties = ref<Number[]>(getFiltersList.value);
+const names = ref<object[]>(getTopFilterNames.value);
 const data = ref<object>(await getData());
+
+if(getUrlId.value !== categoryId){
+  setFilter([]);
+  setFilterNames([]);
+  setUrlId(categoryId);
+}
 
 async function filterProperties(selectedProps:Number[], namesInput:object[]) {
   setFilter(selectedProps);
