@@ -144,7 +144,7 @@ const data = ref<object>(await getData());
 
 async function filterProperties(selectedProps:Number[], namesInput:object[]) {
   setFilter(selectedProps);
-  setFilterNames(names);
+  setFilterNames(namesInput);
   selectedProperties.value = selectedProps;
   names.value = namesInput;
   data.value = await getData();
