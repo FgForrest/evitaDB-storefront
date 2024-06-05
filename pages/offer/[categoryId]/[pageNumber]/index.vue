@@ -3,16 +3,44 @@
     <NavContainer :categoryId="parseInt(categoryId)" />
     <Splitter>
       <SplitterPanel :size="25" :minSize="10">
+        <div class="center">
+          <div>
+            <Bar ref="chart" :data="chartData" :options="chartOptions" />
+            <div class="center">
+              <Slider
+                v-model="value"
+                range
+                class="w-14rem"
+                @change="changeColors"
+                :min="
+                  parseInt(
+                    data?.queryProduct?.extraResults?.priceHistogram?.min
+                  )
+                "
+                :max="
+                  parseInt(
+                    data?.queryProduct?.extraResults?.priceHistogram?.max
+                  )
+                "
+              />
+            </div>
+          </div>
+        </div>
         <BrandSelector :category-id="parseInt(categoryId)" />
         <PropertiesSelector
-          :data="data.queryProduct.extraResults.facetSummary?.parameterValues"
-          :selectedProps="getFiltersList"
+          :data="
+            data?.queryProduct.extraResults.facetSummary?.parameterValues
+              ? data?.queryProduct.extraResults.facetSummary?.parameterValues
+              : []
+          "
+          :selectedProps="selectedProperties"
+          :names="names"
           @filter="filterProperties"
         />
       </SplitterPanel>
       <SplitterPanel :size="75">
         <DataView
-          :value="data.queryProduct.recordPage.data"
+          :value="data?.queryProduct?.recordPage?.data"
           :layout="layout"
           :data-key="'primaryKey'"
         >
@@ -120,12 +148,21 @@
     <PageCounter
       :categoryId="parseInt(categoryId)"
       :page="parseInt(pageNumber)"
-      :last-page-number="data.queryProduct.recordPage.lastPageNumber"
+      :last-page-number="
+        data?.queryProduct?.recordPage?.lastPageNumber
+          ? data?.queryProduct?.recordPage?.lastPageNumber
+          : 0
+      "
     />
   </div>
 </template>
 
 <script lang="ts" setup>
+import type { GetProductsFilterQuery } from "#gql";
+import { type ChartData } from "chart.js";
+import { storeToRefs } from "pinia";
+import { Bar } from "vue-chartjs";
+
 const route = useRoute();
 
 const categoryId = route.params.categoryId.toString();
@@ -133,28 +170,145 @@ const pageNumber = route.params.pageNumber.toString();
 
 const layout = ref<any>("grid");
 const filtersStore = useFiltersStore();
-const { filtersList, getFiltersList } = storeToRefs(filtersStore);
+const { setFilter, setFilterNames, setUrlId } = filtersStore;
+const { getFiltersList, getTopFilterNames, getUrlId } =
+  storeToRefs(filtersStore);
 const GqlInstance = useGql();
-const data = ref<object>(await getData());
+const selectedProperties = ref<Number[]>(getFiltersList.value);
+const names = ref<object[]>(getTopFilterNames.value);
+const data = ref<GetProductsFilterQuery | GetProductsFilterQuery | null>(
+  await getData()
+);
+const chart = ref<InstanceType<typeof Bar> | null>(null);
+const histogramData = ref<HistogramType | null>(getHistogramData());
+const value = ref<number[]>([
+  parseInt(data?.value?.queryProduct?.extraResults?.priceHistogram?.min),
+  parseInt(data?.value?.queryProduct?.extraResults?.priceHistogram?.max),
+]);
 
-async function filterProperties(selectedProps) {
-  getFiltersList.value = selectedProps;
-  filtersList.value = selectedProps;
+if (getUrlId.value !== categoryId) {
+  setFilter([]);
+  setFilterNames([]);
+  setUrlId(categoryId);
+}
+
+const chartData = ref<
+  ChartData<"bar", (number | [number, number] | null)[], unknown>
+>({
+  labels: (histogramData?.value?.labels as string[]) || [],
+  datasets: [
+    {
+      label: "Produkty",
+      backgroundColor: getChartColors(),
+      data:
+        (histogramData?.value?.dataValues as (
+          | number
+          | [number, number]
+          | null
+        )[]) || [],
+    },
+  ],
+});
+
+const chartOptions = ref<any>({
+  responsive: false,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+});
+
+function changeColors() {
+  if (chart.value?.$data)
+    chart.value.chart.data.datasets[0].backgroundColor = getChartColors();
+  updateChart();
+}
+
+function updateChart() {
+  if (chart.value) {
+    chart?.value.chart.update("active");
+    chart?.value.chart.render();
+    chart?.value.chart.draw();
+  }
+}
+
+function getChartColors(): Array<string> {
+  const colors: string[] = [];
+  if (histogramData?.value?.labels) {
+    for (const item of histogramData?.value?.labels) {
+      if (isInRange(parseInt(item), value.value[0], value.value[1])) {
+        colors.push("#10b981");
+      } else {
+        colors.push("#A9A9A9");
+      }
+    }
+  }
+  return colors;
+}
+
+function isInRange(
+  input: number,
+  startRange: number,
+  endRange: number
+): boolean {
+  if (input >= startRange && input <= endRange) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+async function filterProperties(
+  selectedProps: Number[],
+  namesInput: object[]
+): Promise<void> {
+  setFilter(selectedProps);
+  setFilterNames(namesInput);
+  selectedProperties.value = selectedProps;
+  names.value = namesInput;
   data.value = await getData();
 }
 
-async function getData() {
-  if (getFiltersList.value.length === 0) {
-    return await GqlInstance("getProducts", {
-      categoryId: parseInt(categoryId),
-      page: parseInt(pageNumber),
-    });
+function getHistogramData(): HistogramType | null {
+  const labels = [] as string[];
+  const dataValues = [] as number[];
+
+  if (data.value?.queryProduct.extraResults.priceHistogram) {
+    for (const item of data.value.queryProduct.extraResults.priceHistogram
+      .buckets) {
+      labels.push(item.threshold);
+      dataValues.push(item.occurrences);
+    }
+    return {
+      labels,
+      dataValues,
+    };
   } else {
-    return await GqlInstance("getProductsFilter", {
-      categoryId: parseInt(categoryId),
-      page: parseInt(pageNumber),
-      selectedProps: getFiltersList.value,
-    });
+    return null;
+  }
+}
+
+async function getData(): Promise<
+  GetProductsFilterQuery | GetProductsFilterQuery | null
+> {
+  if (selectedProperties && categoryId && pageNumber && selectedProperties) {
+    if (selectedProperties.value.length === 0) {
+      return await GqlInstance("getProducts", {
+        categoryId: parseInt(categoryId),
+        page: parseInt(pageNumber),
+      });
+    } else {
+      const selectedProps = selectedProperties.value.map(Number);
+      return await GqlInstance("getProductsFilter", {
+        categoryId: parseInt(categoryId),
+        page: parseInt(pageNumber),
+        selectedProps: selectedProps,
+      });
+    }
+  } else {
+    return null;
   }
 }
 </script>
@@ -163,5 +317,16 @@ async function getData() {
 .link {
   text-decoration: none;
   color: black;
+}
+
+.center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.center:last-child {
+  margin-top: 25px;
 }
 </style>

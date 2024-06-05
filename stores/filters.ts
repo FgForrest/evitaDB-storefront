@@ -5,16 +5,25 @@ export const useFiltersStore = defineStore({
   state: () => {
     return {
       filtersList: [] as Number[],
-    };
+      topFilterNames: [] as object[],
+      urlId: '' as string,
+    }
   },
   actions: {
     setFilter(flter: Number[]) {
       this.filtersList = flter;
-      return this.filtersList;
     },
+    setFilterNames(filterNames: object[]){
+      this.topFilterNames = filterNames;
+    },
+    setUrlId(pageUrlId: string){
+      this.urlId = pageUrlId;
+    }
   },
   getters: {
-    getFiltersList: (state) => state.filtersList,
+    getFiltersList: state => state.filtersList,
+    getTopFilterNames: state => state.topFilterNames,
+    getUrlId: state => state.urlId,
   },
   persist: {
     storage: persistedState.sessionStorage,

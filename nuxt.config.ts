@@ -15,6 +15,7 @@ export default defineNuxtConfig({
   ],
   devtools: { enabled: true },
   modules: ["nuxt-graphql-client", "nuxt-primevue", "@nuxt/image", "@pinia/nuxt", "@pinia-plugin-persistedstate/nuxt"],
+  plugins: ["~/plugins/chartjs.ts"],
   "graphql-client": {
     codegen: {
       avoidOptionals: true,

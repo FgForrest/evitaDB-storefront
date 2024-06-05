@@ -1,6 +1,12 @@
 <template>
   <p class="title">Brand</p>
-  <Tree :value="getNodes()" selectionMode="checkbox" class="no-border"></Tree>
+  <Tree
+    v-model:selectionKeys="selectedKeys"
+    :value="getNodes()"
+    @change="update"
+    selectionMode="checkbox"
+    class="no-border"
+  ></Tree>
 </template>
 
 <script setup lang="ts">
@@ -12,6 +18,8 @@ const { categoryId } = defineProps({
 });
 
 const { data } = await useAsyncGql("getBrands", { categoryId: categoryId });
+const selectedKeys = ref<object>();
+
 
 function getNodes(): object[] {
   const brands: object[] = [];
@@ -20,13 +28,17 @@ function getNodes(): object[] {
   if (rawBrands) {
     for (let i = 0; i < rawBrands.length; i++) {
       brands.push({
-        key: i,
+        key: rawBrands[i].facetEntity?.primaryKey,
         label: rawBrands[i].facetEntity?.attributes?.name,
         data: rawBrands[i].facetEntity?.attributes?.name,
       });
     }
   }
   return brands;
+}
+
+function update():void{
+  console.log(selectedKeys);
 }
 </script>
 
