@@ -159,8 +159,7 @@
 
 <script lang="ts" setup>
 import type { GetProductsFilterQuery } from "#gql";
-import { Legend, plugins, type ChartData } from "chart.js";
-import { color } from "chart.js/helpers";
+import { type ChartData } from "chart.js";
 import { storeToRefs } from "pinia";
 import { Bar } from "vue-chartjs";
 
@@ -180,7 +179,7 @@ const names = ref<object[]>(getTopFilterNames.value);
 const data = ref<GetProductsFilterQuery | GetProductsFilterQuery | null>(
   await getData()
 );
-const chart = ref(null);
+const chart = ref<InstanceType<typeof Bar> | null>(null);
 const histogramData = ref<HistogramType | null>(getHistogramData());
 const value = ref<number[]>([
   parseInt(data?.value?.queryProduct?.extraResults?.priceHistogram?.min),
@@ -216,20 +215,23 @@ const chartOptions = ref<any>({
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: false
-    }
-  }
+      display: false,
+    },
+  },
 });
 
 function changeColors() {
-  chart.value.chart.data.datasets[0].backgroundColor = getChartColors();
+  if (chart.value?.$data)
+    chart.value.chart.data.datasets[0].backgroundColor = getChartColors();
   updateChart();
 }
 
 function updateChart() {
-  chart.value.chart.update("active");
-  chart.value.chart.render();
-  chart.value.chart.draw();
+  if (chart.value) {
+    chart?.value.chart.update("active");
+    chart?.value.chart.render();
+    chart?.value.chart.draw();
+  }
 }
 
 function getChartColors(): Array<string> {
