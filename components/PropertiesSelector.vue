@@ -23,7 +23,7 @@ const { selectedProps, data, names } = defineProps({
     required: false,
   },
   data: {
-    type: Array as () => Array<object>,
+    type: Array as () => Array<object | undefined>,
     required: true,
   },
   names: {
@@ -34,6 +34,7 @@ const { selectedProps, data, names } = defineProps({
 
 const selectedKeys = ref<object>(getSelectedKeys());
 
+
 function getNodes(): object[] {
   const properties: object[] = [];
   const rawProperties = data;
@@ -41,16 +42,16 @@ function getNodes(): object[] {
     for (let i = 0; i < rawProperties.length; i++) {
       let property = {
         key: "ignore-" + i,
-        label: rawProperties[i].groupEntity?.attributes?.name,
-        data: rawProperties[i].groupEntity?.attributes?.code,
+        label: rawProperties[i]?.groupEntity?.attributes?.name,
+        data: rawProperties[i]?.groupEntity?.attributes?.code,
         children: new Array<object>(),
       };
-      for (let j = 0; j < rawProperties[i].facetStatistics.length; j++) {
+      for (let j = 0; j < rawProperties[i]?.facetStatistics.length; j++) {
         property.children.push({
-          key: rawProperties[i].facetStatistics[j].facetEntity?.primaryKey,
+          key: rawProperties[i]?.facetStatistics[j].facetEntity?.primaryKey,
           label:
-            rawProperties[i].facetStatistics[j].facetEntity?.attributes?.name,
-          data: rawProperties[i].facetStatistics[j].facetEntity?.attributes
+            rawProperties[i]?.facetStatistics[j].facetEntity?.attributes?.name,
+          data: rawProperties[i]?.facetStatistics[j].facetEntity?.attributes
             ?.name,
         });
       }
