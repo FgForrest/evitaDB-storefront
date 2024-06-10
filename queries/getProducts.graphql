@@ -1,9 +1,14 @@
-query getProducts($categoryId: [Int!], $page: Int!) {
+query getProducts($categoryId: [Int!], $page: Int!, $priceFilter: [BigDecimal]) {
   queryProduct(
     filterBy: {
       hierarchyCategoriesWithin: {
         ofParent: { entityPrimaryKeyInSet: $categoryId }
       }
+      userFilter: [
+        {
+          priceBetween: $priceFilter
+        }
+      ]
       priceInPriceLists: ["basic"]
       priceInCurrency: EUR
       priceValidInNow: true
@@ -11,6 +16,7 @@ query getProducts($categoryId: [Int!], $page: Int!) {
     }
   ) {
     recordPage(number: $page, size: 50) {
+      totalRecordCount
       data {
         primaryKey
         attributes {

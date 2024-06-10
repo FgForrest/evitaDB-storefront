@@ -10,6 +10,12 @@
 </template>
 
 <script setup lang="ts">
+type Emits = {
+  (event: "filterBrands", value: number[]): Promise<void>;
+};
+
+const emit = defineEmits<Emits>();
+
 const { categoryId } = defineProps({
   categoryId: {
     type: Number,
@@ -19,7 +25,6 @@ const { categoryId } = defineProps({
 
 const { data } = await useAsyncGql("getBrands", { categoryId: categoryId });
 const selectedKeys = ref<object>();
-
 
 function getNodes(): object[] {
   const brands: object[] = [];
@@ -37,8 +42,12 @@ function getNodes(): object[] {
   return brands;
 }
 
-function update():void{
-  console.log(selectedKeys);
+function update(): void {
+  const brands: number[] = [];
+  for (const id in selectedKeys.value) {
+    brands.push(parseInt(id));
+  }
+  emit("filterBrands", brands);
 }
 </script>
 

@@ -13,7 +13,7 @@
 import { ref } from "vue";
 
 type Emits = {
-  (event: "filter", value: Number[], names: object[]): void;
+  (event: "filter", value: number[], names: object[]): void;
 };
 
 const emit = defineEmits<Emits>();

@@ -8,10 +8,11 @@
             <Bar ref="chart" :data="chartData" :options="chartOptions" />
             <div class="center">
               <Slider
-                v-model="value"
+                v-model="selectedPriceRange"
                 range
                 class="w-14rem"
-                @change="changeColors"
+                @change="updateChartData"
+                @slideend="priceRangeChanged"
                 :min="
                   parseInt(
                     data?.queryProduct?.extraResults?.priceHistogram?.min
@@ -26,7 +27,10 @@
             </div>
           </div>
         </div>
-        <BrandSelector :category-id="parseInt(categoryId)" />
+        <BrandSelector
+          :category-id="parseInt(categoryId)"
+          @filter-brands="filterBrands"
+        />
         <PropertiesSelector
           :data="
             data?.queryProduct.extraResults.facetSummary?.parameterValues
@@ -170,25 +174,29 @@ const pageNumber = route.params.pageNumber.toString();
 
 const layout = ref<any>("grid");
 const filtersStore = useFiltersStore();
-const { setFilter, setFilterNames, setUrlId } = filtersStore;
-const { getFiltersList, getTopFilterNames, getUrlId } =
+const { setFilter, setFilterNames, setUrlId, setPrice, setBrands } =
+  filtersStore;
+const { getFiltersList, getTopFilterNames, getUrlId, getPrice, getBrands } =
   storeToRefs(filtersStore);
 const GqlInstance = useGql();
-const selectedProperties = ref<Number[]>(getFiltersList.value);
+const selectedProperties = ref<number[]>(getFiltersList.value);
+const selectedBrands = ref<number[]>();
 const names = ref<object[]>(getTopFilterNames.value);
+const selectedPriceRange = ref<number[]>([
+  getPrice.value[0] ? getPrice.value[0] : -1,
+  getPrice.value[1] ? getPrice.value[1] : -1,
+]);
 const data = ref<GetProductsFilterQuery | GetProductsFilterQuery | null>(
   await getData()
 );
 const chart = ref<InstanceType<typeof Bar> | null>(null);
 const histogramData = ref<HistogramType | null>(getHistogramData());
-const value = ref<number[]>([
-  parseInt(data?.value?.queryProduct?.extraResults?.priceHistogram?.min),
-  parseInt(data?.value?.queryProduct?.extraResults?.priceHistogram?.max),
-]);
 
 if (getUrlId.value !== categoryId) {
   setFilter([]);
   setFilterNames([]);
+  setBrands([]);
+  setPrice([]);
   setUrlId(categoryId);
 }
 
@@ -220,10 +228,19 @@ const chartOptions = ref<any>({
   },
 });
 
-function changeColors() {
+async function priceRangeChanged(): Promise<void> {
   if (chart.value?.$data)
     chart.value.chart.data.datasets[0].backgroundColor = getChartColors();
   updateChart();
+  setPrice(selectedPriceRange.value);
+  data.value = await getData();
+}
+
+async function updateChartData(): Promise<void> {
+  if (chart.value?.$data)
+    chart.value.chart.data.datasets[0].backgroundColor = getChartColors();
+  updateChart();
+  setPrice(selectedPriceRange.value);
 }
 
 function updateChart() {
@@ -238,7 +255,13 @@ function getChartColors(): Array<string> {
   const colors: string[] = [];
   if (histogramData?.value?.labels) {
     for (const item of histogramData?.value?.labels) {
-      if (isInRange(parseInt(item), value.value[0], value.value[1])) {
+      if (
+        isInRange(
+          parseInt(item),
+          selectedPriceRange.value[0],
+          selectedPriceRange.value[1]
+        )
+      ) {
         colors.push("#10b981");
       } else {
         colors.push("#A9A9A9");
@@ -261,7 +284,7 @@ function isInRange(
 }
 
 async function filterProperties(
-  selectedProps: Number[],
+  selectedProps: number[],
   namesInput: object[]
 ): Promise<void> {
   setFilter(selectedProps);
@@ -269,6 +292,8 @@ async function filterProperties(
   selectedProperties.value = selectedProps;
   names.value = namesInput;
   data.value = await getData();
+  //selectedPriceRange.value = [data.value?.queryProduct.extraResults.priceHistogram?.min, data.value?.queryProduct.extraResults.priceHistogram?.max];
+  //updateChart();
 }
 
 function getHistogramData(): HistogramType | null {
@@ -293,12 +318,21 @@ function getHistogramData(): HistogramType | null {
 async function getData(): Promise<
   GetProductsFilterQuery | GetProductsFilterQuery | null
 > {
-  if (selectedProperties && categoryId && pageNumber && selectedProperties) {
+  if (
+    selectedProperties &&
+    categoryId &&
+    pageNumber &&
+    selectedProperties &&
+    selectedPriceRange.value[0] !== -1 &&
+    selectedPriceRange.value[1] !== -1
+  ) {
     if (selectedProperties.value.length === 0) {
-      return await GqlInstance("getProducts", {
+      const res = await GqlInstance("getProducts", {
         categoryId: parseInt(categoryId),
         page: parseInt(pageNumber),
+        priceFilter: selectedPriceRange.value.map((x) => x.toFixed(2)),
       });
+      return res;
     } else {
       const selectedProps = selectedProperties.value.map(Number);
       return await GqlInstance("getProductsFilter", {
@@ -310,6 +344,11 @@ async function getData(): Promise<
   } else {
     return null;
   }
+}
+
+async function filterBrands(values: number[]): Promise<void> {
+  selectedBrands.value = values;
+  setBrands(values);
 }
 </script>
 

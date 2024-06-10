@@ -1,8 +1,10 @@
 <template>
   <div>
     <NavMenu />
-    <div>
-      <slot />
+    <div class="base-view">
+      <div class="content">
+        <slot />
+      </div>
     </div>
     <Footer />
   </div>
@@ -10,4 +12,20 @@
 
 <script setup></script>
 
-<style></style>
+<style>
+.base-view {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.content {
+  width: 100%;
+}
+
+@media only screen and (min-width: 1750px) {
+  .content {
+    width: 1750px;
+  }
+}
+</style>
