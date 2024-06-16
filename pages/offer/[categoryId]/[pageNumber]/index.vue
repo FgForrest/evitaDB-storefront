@@ -9,7 +9,7 @@
             <div class="center">
               <Slider
                 v-model="selectedPriceRange"
-                range
+                :range="true"
                 class="w-14rem"
                 @change="updateChartData"
                 @slideend="priceRangeChanged"
@@ -162,7 +162,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GetProductsFilterQuery } from "#gql";
+import type { GetProductsBrandsFilterQuery, GetProductsBrandsQuery, GetProductsFilterQuery } from "#gql";
 import { type ChartData } from "chart.js";
 import { storeToRefs } from "pinia";
 import { Bar } from "vue-chartjs";
@@ -182,6 +182,15 @@ const GqlInstance = useGql();
 const selectedProperties = ref<number[]>(getFiltersList.value);
 const selectedBrands = ref<number[]>();
 const names = ref<object[]>(getTopFilterNames.value);
+
+if (getUrlId.value !== categoryId) {
+  setFilter([]);
+  setFilterNames([]);
+  setBrands([]);
+  setPrice([-1, -1]);
+  setUrlId(categoryId);
+}
+
 const selectedPriceRange = ref<number[]>([
   getPrice.value[0] ? getPrice.value[0] : -1,
   getPrice.value[1] ? getPrice.value[1] : -1,
@@ -191,14 +200,6 @@ const data = ref<GetProductsFilterQuery | GetProductsFilterQuery | null>(
 );
 const chart = ref<InstanceType<typeof Bar> | null>(null);
 const histogramData = ref<HistogramType | null>(getHistogramData());
-
-if (getUrlId.value !== categoryId) {
-  setFilter([]);
-  setFilterNames([]);
-  setBrands([]);
-  setPrice([]);
-  setUrlId(categoryId);
-}
 
 const chartData = ref<
   ChartData<"bar", (number | [number, number] | null)[], unknown>
@@ -316,21 +317,79 @@ function getHistogramData(): HistogramType | null {
 }
 
 async function getData(): Promise<
-  GetProductsFilterQuery | GetProductsFilterQuery | null
+  GetProductsFilterQuery | GetProductsFilterQuery | GetProductsBrandsQuery | GetProductsBrandsFilterQuery | null
 > {
   if (
     selectedProperties &&
     categoryId &&
     pageNumber &&
     selectedProperties &&
-    selectedPriceRange.value[0] !== -1 &&
-    selectedPriceRange.value[1] !== -1
+    selectedPriceRange.value[0] === -1 &&
+    selectedPriceRange.value[1] === -1
   ) {
-    if (selectedProperties.value.length === 0) {
+    if (selectedProperties.value.length === 0 && selectedBrands.value?.length === 0) {
       const res = await GqlInstance("getProducts", {
         categoryId: parseInt(categoryId),
         page: parseInt(pageNumber),
+        priceFilter: undefined
+      });
+      setPriceRange(parseInt(res.queryProduct.extraResults.priceHistogram?.min), parseInt(res.queryProduct.extraResults.priceHistogram?.max));
+      return res;
+    } else if(selectedProperties.value.length === 0 && selectedBrands.value?.length !== 0) {
+      const res = await GqlInstance("getProductsBrands", {
+        categoryId: parseInt(categoryId),
+        page: parseInt(pageNumber),
+        priceFilter: undefined,
+        brandFilter: selectedBrands.value as number[]
+      });
+      setPriceRange(parseInt(res.queryProduct.extraResults.priceHistogram?.min), parseInt(res.queryProduct.extraResults.priceHistogram?.max));
+      return res;
+    } else if(selectedProperties.value.length !== 0 && selectedBrands.value?.length !== 0) {
+      const selectedProps = selectedProperties.value.map(Number);
+      const res = await GqlInstance("getProductsBrandsFilter", {
+        categoryId: parseInt(categoryId),
+        page: parseInt(pageNumber),
+        selectedProps: selectedProps,
+        priceFilter: undefined,
+        brandFilter: selectedBrands.value as number[]
+      });
+      setPriceRange(parseInt(res.queryProduct.extraResults.priceHistogram?.min), parseInt(res.queryProduct.extraResults.priceHistogram?.max));
+      return res;
+    } else {
+      const selectedProps = selectedProperties.value.map(Number);
+      const res = await GqlInstance("getProductsFilter", {
+        categoryId: parseInt(categoryId),
+        page: parseInt(pageNumber),
+        selectedProps: selectedProps,
+        priceFilter: undefined
+      });
+      setPriceRange(parseInt(res.queryProduct.extraResults.priceHistogram?.min),  parseInt(res.queryProduct.extraResults.priceHistogram?.max));
+      return res;
+    }
+  } else {
+    if (selectedProperties.value.length === 0 && selectedBrands.value?.length === 0) {
+      const res = await GqlInstance("getProducts", {
+        categoryId: parseInt(categoryId),
+        page: parseInt(pageNumber),
+        priceFilter: selectedPriceRange.value.map((x) => x.toFixed(2))
+      });
+      return res;
+    } else if(selectedProperties.value.length === 0 && selectedBrands.value?.length !== 0) {
+      const res = await GqlInstance("getProductsBrands", {
+        categoryId: parseInt(categoryId),
+        page: parseInt(pageNumber),
         priceFilter: selectedPriceRange.value.map((x) => x.toFixed(2)),
+        brandFilter: selectedBrands.value as number[]
+      });
+      return res;
+    } else if(selectedProperties.value.length !== 0 && selectedBrands.value?.length !== 0) {
+      const selectedProps = selectedProperties.value.map(Number);
+      const res = await GqlInstance("getProductsBrandsFilter", {
+        categoryId: parseInt(categoryId),
+        page: parseInt(pageNumber),
+        selectedProps: selectedProps,
+        priceFilter: selectedPriceRange.value.map((x) => x.toFixed(2)),
+        brandFilter: selectedBrands.value as number[]
       });
       return res;
     } else {
@@ -339,16 +398,22 @@ async function getData(): Promise<
         categoryId: parseInt(categoryId),
         page: parseInt(pageNumber),
         selectedProps: selectedProps,
+        priceFilter: selectedPriceRange.value.map((x) => x.toFixed(2))
       });
     }
-  } else {
-    return null;
   }
+}
+
+
+function setPriceRange(startNum: number, endNum: number): void{
+  selectedPriceRange.value = [startNum, endNum];
+  setPrice([startNum, endNum]);
 }
 
 async function filterBrands(values: number[]): Promise<void> {
   selectedBrands.value = values;
   setBrands(values);
+  data.value = await getData();
 }
 </script>
 
@@ -362,7 +427,7 @@ async function filterBrands(values: number[]): Promise<void> {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 76px;
 }
 
 .center:last-child {

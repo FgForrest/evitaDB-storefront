@@ -1,4 +1,4 @@
-query getProductsFilter($categoryId: [Int!], $selectedProps: [Int!], $page: Int!, , $priceFilter: [BigDecimal]) {
+query getProductsBrandsFilter($categoryId: [Int!], $selectedProps: [Int!], $page: Int!, $priceFilter: [BigDecimal], $brandFilter: [Int!]) {
   queryProduct(
     filterBy: {
       hierarchyCategoriesWithin: {
@@ -6,7 +6,8 @@ query getProductsFilter($categoryId: [Int!], $selectedProps: [Int!], $page: Int!
       }
       userFilter: {
         facetParameterValuesHaving: { entityPrimaryKeyInSet: $selectedProps },
-        priceBetween: $priceFilter
+        priceBetween: $priceFilter,
+        facetBrandHaving: { entityPrimaryKeyInSet: $brandFilter}
       }
       priceInPriceLists: ["basic"]
       priceInCurrency: EUR

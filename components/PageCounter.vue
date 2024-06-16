@@ -72,8 +72,9 @@ async function movePrevious(): Promise<void> {
   }
 }
 
-const getPages = () => {
+function getPages():number[] {
   const pages: number[] = [];
+  console.log(lastPageNumber);
   let count = 9;
   for (let i = 1; i < page; i++) {
     pages.push(i);
@@ -86,7 +87,8 @@ const getPages = () => {
     i <= (page + count <= lastPageNumber ? page + count : lastPageNumber);
     i++
   ) {
-    pages.push(i);
+    if(i < lastPageNumber)
+      pages.push(i);
   }
   return pages;
 };
